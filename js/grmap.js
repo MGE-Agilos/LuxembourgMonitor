@@ -349,6 +349,15 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
     groups.attr("data-hl", (p) => (ids.has(p.id) ? "focus" : null));
   }
 
+  // Assistant answer: light up LU communes (LAU "0304" or "lu:0304") and cross-border places (ids), fade the rest.
+  function highlightPlaces(ids = []) {
+    const set = new Set(ids.map((x) => (/^\d{4}$/.test(x) ? `lu:${x}` : x)));
+    sel.classed("has-hl", set.size > 0);
+    lu.attr("data-hl", (d) => (set.has(`lu:${d.lau}`) ? "answer" : null));
+    groups.attr("data-hl", (p) => (set.has(p.id) ? "answer" : null));
+    if (set.size) groups.filter((p) => set.has(p.id)).raise();
+  }
+
   async function loadCountries() {
     try {
       if (typeof topojson === "undefined") return;
@@ -370,7 +379,7 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
   loadCountries();
   relabel();
   return {
-    update, select, highlight, clear: () => highlight({}), relabel, setMode, attractStep,
+    update, select, highlight, highlightPlaces, clear: () => highlight({}), relabel, setMode, attractStep,
     mode: () => mode, resetAttract: () => { attractI = 0; },
   };
 }

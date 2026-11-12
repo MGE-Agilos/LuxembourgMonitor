@@ -1,6 +1,6 @@
 import { createAttract } from "./attract.js";
-import { renderAssistant } from "./assistant.js";
-import { renderCommune } from "./commune.js";
+import { createChat } from "./assistant.js";
+import { TABS, renderCommune } from "./commune.js";
 import { FACT_MS, IDLE_MS, KIOSK, VIDEO } from "./config.js";
 import { displayName, findCommune, loadData } from "./data.js";
 import { h } from "./dom.js";
@@ -8,7 +8,7 @@ import { createGrMap } from "./grmap.js";
 import { applyStatic, getLang, setLang, t, tl } from "./i18n.js";
 import { createMap } from "./map.js";
 import { comparisons } from "./ouvivre.js";
-import { ouvivreState, preselectOuvivre, renderOuvivre, resetOuvivre } from "./ouvivre-ui.js";
+import { ouvivreContext, ouvivreState, preselectOuvivre, renderOuvivre, resetOuvivre } from "./ouvivre-ui.js";
 import { renderCompare } from "./compare.js";
 import { problemsTeaser, renderCountry, renderPlace, renderSources } from "./pages.js";
 
@@ -66,7 +66,31 @@ const grAttract = {
 const homeAttract = createAttract(document.getElementById("attract"), grAttract, homeFacts(), { intervalMs: FACT_MS, cta: "ov.q" });
 
 const wide = matchMedia("(min-width: 900px)");
-let assistant = null;
+
+// Page context sent with each question to the assistant (validated again by the server).
+function getContext() {
+  const [, view = "", arg = "", tab] = (location.hash || "#/").split("/");
+  const id = decodeURIComponent(arg);
+  if (view === "c" && st.byLau.has(arg)) return { page: "commune", lau: arg, tab: TABS.includes(tab) ? tab : "vivre" };
+  if (view === "p" && st.ouvivre.places.some((p) => p.id === id)) return { page: "place", place: id };
+  if (view === "compare") {
+    const places = location.hash.split("/").slice(2).filter(Boolean).map(decodeURIComponent);
+    return { page: "compare", places };
+  }
+  if (view === "pays") return { page: "pays" };
+  if (view === "" || view === "from") return { page: "ouvivre", ...ouvivreContext() };
+  return { page: "other" };
+}
+// Answers light up communes / places on whichever map is visible.
+function highlightAnswer(ids) {
+  if (mainEl.classList.contains("is-home")) grmap.highlightPlaces(ids);
+  else if (!mainEl.classList.contains("is-full")) map.highlight({ answer: ids.map((x) => (/^lu:\d{4}$/.test(x) ? x.slice(3) : x)).filter((x) => /^\d{4}$/.test(x)) });
+}
+const chat = createChat({
+  getContext, highlight: highlightAnswer, navigate: (hash) => go(hash),
+  onOpen: () => { attract.stop(); if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); } },
+});
+let lastPage = "#/";
 
 function go(hash) {
   if (location.hash !== hash) history.pushState(null, "", hash);
@@ -84,7 +108,6 @@ function setView(mode) {
   luSvg.toggleAttribute("hidden", home);
   const cur = (id, on) => { const el = document.getElementById(id); if (on) el.setAttribute("aria-current", "page"); else el.removeAttribute("aria-current"); };
   cur("nav-where", home);
-  cur("nav-ask", location.hash.startsWith("#/ask"));
   document.querySelectorAll(".lm-foot a[href]").forEach((a) => {
     if (location.hash.startsWith(a.getAttribute("href"))) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   });
@@ -94,8 +117,6 @@ let seq = 0;
 function route() {
   attract.stop();
   homeAttract.stop();
-  assistant?.dispose();
-  assistant = null;
   const my = ++seq;
   const isCurrent = () => my === seq;
   let parts = (location.hash || "#/").split("/");
@@ -105,6 +126,15 @@ function route() {
     history.replaceState(null, "", "#/");
     parts = ["#", ""];
   }
+  if (parts[1] === "ask") {
+    // "#/ask[/<lau>]" opens the bubble on top of the commune page (or the page the visitor came from)
+    const l = st.byLau.has(parts[2]) ? parts[2] : null;
+    history.replaceState(null, "", l ? `#/c/${l}` : lastPage);
+    route();
+    chat.open();
+    return;
+  }
+  lastPage = location.hash || "#/";
   const [, view, arg] = parts;
   const place = view === "p" ? st.ouvivre.places.find((x) => x.id === decodeURIComponent(arg || "")) : null;
   if (place?.lau && st.byLau.has(place.lau)) { history.replaceState(null, "", `#/c/${place.lau}`); route(); return; }
@@ -114,17 +144,13 @@ function route() {
     map.highlight({ focus: [c.lau], twins: c.twins });
     renderCommune(panel, c, {
       tab: parts[3], go, isCurrent,
-      onSelect: (l) => go(`#/c/${l}`), onAsk: (l) => go(`#/ask/${l}`),
+      onSelect: (l) => go(`#/c/${l}`), onAsk: () => chat.open(),
       onTab: (k) => history.replaceState(null, "", `#/c/${c.lau}/${k}`),
     });
-  } else if (view === "ask") {
-    setView("map");
-    map.clear();
-    assistant = renderAssistant(panel, { lau: st.byLau.has(arg) ? arg : null, map, onSelect: (l) => go(`#/c/${l}`) });
   } else if (view === "pays") {
     setView("map");
     map.clear();
-    renderCountry(panel, { onAsk: () => go("#/ask") });
+    renderCountry(panel, { onAsk: () => chat.open() });
     if (!VIDEO && (KIOSK || wide.matches)) attract.start();
   } else if (place) {
     setView("full");
@@ -141,13 +167,14 @@ function route() {
     ovView = renderOuvivre({
       lead, panel, legend, data: st, grmap,
       onCommune: (l) => go(`#/c/${l}`),
-      onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); } },
+      onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); } chat.refresh(); },
       teaser: problemsTeaser,
     });
     if (!VIDEO && KIOSK && !ouvivreState().hub) { grmap.resetAttract(); homeAttract.start(); }
   }
   panel.scrollTop = 0;
   if (!wide.matches) window.scrollTo(0, 0);
+  chat.refresh();
 }
 
 // Search box: the datalist offers display names in the current language
@@ -173,6 +200,9 @@ document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("clic
   route();
 }));
 
+// The nav "Ask" link opens the bubble (its href #/ask still works without JS routing)
+document.getElementById("nav-ask").addEventListener("click", (e) => { e.preventDefault(); chat.open(); });
+
 // Kiosk: back to the attract screen after IDLE_MS without interaction
 if (KIOSK && !VIDEO) {
   let last = Date.now();
@@ -180,6 +210,7 @@ if (KIOSK && !VIDEO) {
   setInterval(() => {
     const home = !location.hash || location.hash === "#/";
     if (Date.now() - last <= IDLE_MS) return;
+    if (chat.isOpen() || chat.hasThread()) { chat.close({ restoreFocus: false }); chat.reset(); }
     if (!home) { resetOuvivre(); go("#/"); } else if (ouvivreState().hub || !homeAttract.running()) { resetOuvivre(); route(); }
   }, 5000);
 }
@@ -194,8 +225,8 @@ window.LM = {
   go,
   attract: () => attract.start(),
   async ask(question, suggestionId) {
-    if (!location.hash.startsWith("#/ask")) go("#/ask");
-    return assistant.typeAndAsk(question, suggestionId);
+    return chat.typeAndAsk(question, suggestionId);
   },
+  chat,
   ready: true,
 };

@@ -36,6 +36,13 @@ export function preselectOuvivre(id) {
   if (COUNTRIES.includes(c)) S.countries = new Set([...S.countries, c]);
 }
 export const ouvivreState = () => S;
+// Context of the "Ask the data" bubble: the visitor's situation on this page (no hub = nothing chosen yet).
+export function ouvivreContext() {
+  if (!S.hub) return {};
+  const ctx = { hub: S.hub, size_m2: S.size, tenure: S.tenure, time_value: S.tenure === "rent" ? S.timeValue : 0 };
+  if (S.selected) ctx.place = S.selected;
+  return ctx;
+}
 
 const loc = (lang) => (lang === "fr" ? "fr-LU" : "en-GB");
 const eur = (v, lang) => new Intl.NumberFormat(loc(lang), { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(v);
