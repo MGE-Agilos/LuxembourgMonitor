@@ -1,0 +1,695 @@
+{
+ "en": {
+  "q1": {
+   "text": "Kirchberg is part of Luxembourg City, so I looked at communes within 15 km of the city with many children. Sandweiler is the closest at 6.4 km, with 23.4% of residents under 20 and apartments asking 8,793 €/m². Kehlen is a bit farther at 9.6 km, with 24.1% under 20 and 8,157 €/m². Garnich has the highest share of under-20s (24.8%) and 8,078 €/m², but it is 13.6 km away. The trade-off is that the closer you are, the higher the asking prices tend to be. These are statistics, not advice.",
+   "communes": [
+    "0306",
+    "0105",
+    "0102"
+   ],
+   "figures": [
+    {
+     "commune": "0306",
+     "indicator": "dist_lux_km",
+     "value": 6.4,
+     "year": 2026
+    },
+    {
+     "commune": "0306",
+     "indicator": "under20_share",
+     "value": 23.4,
+     "year": 2026
+    },
+    {
+     "commune": "0306",
+     "indicator": "appt_price_m2",
+     "value": 8793,
+     "year": 2026
+    },
+    {
+     "commune": "0105",
+     "indicator": "dist_lux_km",
+     "value": 9.6,
+     "year": 2026
+    },
+    {
+     "commune": "0105",
+     "indicator": "under20_share",
+     "value": 24.1,
+     "year": 2026
+    },
+    {
+     "commune": "0105",
+     "indicator": "appt_price_m2",
+     "value": 8157,
+     "year": 2026
+    },
+    {
+     "commune": "0102",
+     "indicator": "under20_share",
+     "value": 24.8,
+     "year": 2026
+    },
+    {
+     "commune": "0102",
+     "indicator": "appt_price_m2",
+     "value": 8078,
+     "year": 2026
+    },
+    {
+     "commune": "0102",
+     "indicator": "dist_lux_km",
+     "value": 13.6,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "act",
+    "rnpp",
+    "habitat"
+   ],
+   "followup": "Which of these communes has the lowest unemployment rate?"
+  },
+  "q2": {
+   "text": "Over the last 10 years, Weiswampach grew fastest, with population up 61%. Next come Saeul (49.5%), Contern (42.6%), Boulaide (40.7%) and Bous-Waldbredimus (37.6%). Several of these are small communes, so a modest number of new residents can produce a large percentage.",
+   "communes": [
+    "0505",
+    "0707",
+    "0302",
+    "0801",
+    "1209"
+   ],
+   "figures": [
+    {
+     "commune": "0505",
+     "indicator": "pop_growth_10y",
+     "value": 61,
+     "year": 2026
+    },
+    {
+     "commune": "0707",
+     "indicator": "pop_growth_10y",
+     "value": 49.5,
+     "year": 2026
+    },
+    {
+     "commune": "0302",
+     "indicator": "pop_growth_10y",
+     "value": 42.6,
+     "year": 2026
+    },
+    {
+     "commune": "0801",
+     "indicator": "pop_growth_10y",
+     "value": 40.7,
+     "year": 2026
+    },
+    {
+     "commune": "1209",
+     "indicator": "pop_growth_10y",
+     "value": 37.6,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "statec_pop"
+   ],
+   "followup": "Which of these communes are close to Luxembourg City?"
+  },
+  "q3": {
+   "text": "The lowest asking prices for apartments per m² are in Esch-sur-Sûre at 5,681 €/m², then Clervaux at 5,809 €/m² and Wiltz at 5,894 €/m². Goesdorf (6,096 €/m²) and Rumelange (6,466 €/m²) follow. These are average asking prices from listings, July 2025 to June 2026. Only 61 communes have a figure, because the others had fewer than 30 listings.",
+   "communes": [
+    "0802",
+    "0501",
+    "0807",
+    "0804",
+    "0212"
+   ],
+   "figures": [
+    {
+     "commune": "0802",
+     "indicator": "appt_price_m2",
+     "value": 5681,
+     "year": 2026
+    },
+    {
+     "commune": "0501",
+     "indicator": "appt_price_m2",
+     "value": 5809,
+     "year": 2026
+    },
+    {
+     "commune": "0807",
+     "indicator": "appt_price_m2",
+     "value": 5894,
+     "year": 2026
+    },
+    {
+     "commune": "0804",
+     "indicator": "appt_price_m2",
+     "value": 6096,
+     "year": 2026
+    },
+    {
+     "commune": "0212",
+     "indicator": "appt_price_m2",
+     "value": 6466,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "habitat"
+   ],
+   "followup": "Which of these communes are closest to Luxembourg City?"
+  },
+  "q4": {
+   "text": "Esch-sur-Alzette is the larger and denser of the two: 38,275 residents and 2,667 per km², against 31,421 and 1,417 per km² in Differdange. Differdange has grown faster over 10 years (26.7% versus 12.8%) and has a younger profile, with 23.7% under 20 compared with 21.4%. Its unemployment rate is lower, at 9.1% versus 10.8%. Apartment asking prices are similar, about 7,325 €/m² in Esch and 7,198 €/m² in Differdange. Esch is a bit closer to Luxembourg City, at 17.1 km versus 20.4 km.",
+   "communes": [
+    "0204",
+    "0202"
+   ],
+   "figures": [
+    {
+     "commune": "0204",
+     "indicator": "pop",
+     "value": 38275,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "pop",
+     "value": 31421,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "density",
+     "value": 2667,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "density",
+     "value": 1417,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "pop_growth_10y",
+     "value": 12.8,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "pop_growth_10y",
+     "value": 26.7,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "under20_share",
+     "value": 21.4,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "under20_share",
+     "value": 23.7,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "unemployment_rate",
+     "value": 10.8,
+     "year": 2025
+    },
+    {
+     "commune": "0202",
+     "indicator": "unemployment_rate",
+     "value": 9.1,
+     "year": 2025
+    },
+    {
+     "commune": "0204",
+     "indicator": "appt_price_m2",
+     "value": 7325,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "appt_price_m2",
+     "value": 7198,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "statec_pop",
+    "statec_density",
+    "rnpp",
+    "statec_labour",
+    "habitat",
+    "act"
+   ],
+   "followup": "How do they compare with Luxembourg City on prices?"
+  },
+  "q5": {
+   "text": "Looking at the share of residents aged 65 and over, Mondorf-les-Bains comes first with 25.8%. It is followed by Niederanven (23.1%), Remich (22.7%), Mondercange (21.3%) and Diekirch (20.7%). These are statistics about communes, not a judgement on them.",
+   "communes": [
+    "1204",
+    "0305",
+    "1205",
+    "0208",
+    "0603"
+   ],
+   "figures": [
+    {
+     "commune": "1204",
+     "indicator": "over65_share",
+     "value": 25.8,
+     "year": 2026
+    },
+    {
+     "commune": "0305",
+     "indicator": "over65_share",
+     "value": 23.1,
+     "year": 2026
+    },
+    {
+     "commune": "1205",
+     "indicator": "over65_share",
+     "value": 22.7,
+     "year": 2026
+    },
+    {
+     "commune": "0208",
+     "indicator": "over65_share",
+     "value": 21.3,
+     "year": 2026
+    },
+    {
+     "commune": "0603",
+     "indicator": "over65_share",
+     "value": 20.7,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "rnpp"
+   ],
+   "followup": "Which communes have the youngest population?"
+  },
+  "q6": {
+   "text": "Three communes tie for the lowest unemployment rate in 2025: Heffingen, Nommern and Weiler-la-Tour, each at 2.5%. Next come Saeul and Schieren, both at 2.9%. These are statistics for each commune, and small communes can see their rates move quickly.",
+   "communes": [
+    "0405",
+    "0410",
+    "0311",
+    "0707",
+    "0609"
+   ],
+   "figures": [
+    {
+     "commune": "0405",
+     "indicator": "unemployment_rate",
+     "value": 2.5,
+     "year": 2025
+    },
+    {
+     "commune": "0410",
+     "indicator": "unemployment_rate",
+     "value": 2.5,
+     "year": 2025
+    },
+    {
+     "commune": "0311",
+     "indicator": "unemployment_rate",
+     "value": 2.5,
+     "year": 2025
+    },
+    {
+     "commune": "0707",
+     "indicator": "unemployment_rate",
+     "value": 2.9,
+     "year": 2025
+    },
+    {
+     "commune": "0609",
+     "indicator": "unemployment_rate",
+     "value": 2.9,
+     "year": 2025
+    }
+   ],
+   "sources": [
+    "statec_labour"
+   ],
+   "followup": "How do house prices compare in these communes?"
+  }
+ },
+ "fr": {
+  "q1": {
+   "text": "Le Kirchberg fait partie de la commune de Luxembourg-Ville ; pour une jeune famille, voici quelques communes proches à regarder. Sandweiler est la plus proche (6,4 km) avec 23,4 % de moins de 20 ans, mais ses appartements sont à 8 793 €/m². Weiler-la-Tour (9,1 km) est plus abordable, à 6 965 €/m², avec 22,4 % de moins de 20 ans. Kehlen compte la plus forte part de jeunes (24,1 %) pour 8 157 €/m², à 9,6 km. Le compromis : plus on se rapproche du Kirchberg, plus les prix demandés sont élevés. Ce sont des statistiques, pas un conseil.",
+   "communes": [
+    "0306",
+    "0311",
+    "0105",
+    "0307"
+   ],
+   "figures": [
+    {
+     "commune": "0306",
+     "indicator": "dist_lux_km",
+     "value": 6.4,
+     "year": 2026
+    },
+    {
+     "commune": "0306",
+     "indicator": "under20_share",
+     "value": 23.4,
+     "year": 2026
+    },
+    {
+     "commune": "0306",
+     "indicator": "appt_price_m2",
+     "value": 8793,
+     "year": 2026
+    },
+    {
+     "commune": "0311",
+     "indicator": "dist_lux_km",
+     "value": 9.1,
+     "year": 2026
+    },
+    {
+     "commune": "0311",
+     "indicator": "under20_share",
+     "value": 22.4,
+     "year": 2026
+    },
+    {
+     "commune": "0311",
+     "indicator": "appt_price_m2",
+     "value": 6965,
+     "year": 2026
+    },
+    {
+     "commune": "0105",
+     "indicator": "under20_share",
+     "value": 24.1,
+     "year": 2026
+    },
+    {
+     "commune": "0105",
+     "indicator": "appt_price_m2",
+     "value": 8157,
+     "year": 2026
+    },
+    {
+     "commune": "0105",
+     "indicator": "dist_lux_km",
+     "value": 9.6,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "act",
+    "rnpp",
+    "habitat"
+   ],
+   "followup": "Quelles communes proches ont le chômage le plus bas ?"
+  },
+  "q2": {
+   "text": "Sur 10 ans, c'est Weiswampach qui a le plus progressé, avec +61 % d'habitants. Viennent ensuite Saeul (+49,5 %), Contern (+42,6 %), Boulaide (+40,7 %) et Bous-Waldbredimus (+37,6 %). Ce sont des pourcentages : dans de petites communes, quelques nouveaux logements suffisent à faire fortement grimper le chiffre.",
+   "communes": [
+    "0505",
+    "0707",
+    "0302",
+    "0801",
+    "1209"
+   ],
+   "figures": [
+    {
+     "commune": "0505",
+     "indicator": "pop_growth_10y",
+     "value": 61,
+     "year": 2026
+    },
+    {
+     "commune": "0707",
+     "indicator": "pop_growth_10y",
+     "value": 49.5,
+     "year": 2026
+    },
+    {
+     "commune": "0302",
+     "indicator": "pop_growth_10y",
+     "value": 42.6,
+     "year": 2026
+    },
+    {
+     "commune": "0801",
+     "indicator": "pop_growth_10y",
+     "value": 40.7,
+     "year": 2026
+    },
+    {
+     "commune": "1209",
+     "indicator": "pop_growth_10y",
+     "value": 37.6,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "statec_pop"
+   ],
+   "followup": "Quelles communes ont le plus d'habitants en valeur absolue ?"
+  },
+  "q3": {
+   "text": "Parmi les communes pour lesquelles on dispose d'un prix, les appartements les moins chers au m² sont à Esch-sur-Sûre (5681 €/m²), Clervaux (5809 €/m²) et Wiltz (5894 €/m²). Viennent ensuite Goesdorf (6096 €/m²) et Rumelange (6466 €/m²). Ce sont des prix moyens demandés dans les annonces, de juillet 2025 à juin 2026. Seules 61 communes ont une valeur, car les autres avaient moins de 30 annonces.",
+   "communes": [
+    "0802",
+    "0501",
+    "0807",
+    "0804",
+    "0212"
+   ],
+   "figures": [
+    {
+     "commune": "0802",
+     "indicator": "appt_price_m2",
+     "value": 5681,
+     "year": 2026
+    },
+    {
+     "commune": "0501",
+     "indicator": "appt_price_m2",
+     "value": 5809,
+     "year": 2026
+    },
+    {
+     "commune": "0807",
+     "indicator": "appt_price_m2",
+     "value": 5894,
+     "year": 2026
+    },
+    {
+     "commune": "0804",
+     "indicator": "appt_price_m2",
+     "value": 6096,
+     "year": 2026
+    },
+    {
+     "commune": "0212",
+     "indicator": "appt_price_m2",
+     "value": 6466,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "habitat"
+   ],
+   "followup": "Et lesquelles sont les moins chères à moins de 15 km de Luxembourg-Ville ?"
+  },
+  "q4": {
+   "text": "Esch-sur-Alzette compte 38 275 habitants contre 31 421 à Differdange, et elle est plus dense (2 667 contre 1 417 habitants/km²). Differdange a connu une croissance bien plus forte sur 10 ans (26,7 % contre 12,8 %). Le chômage est de 10,8 % à Esch et de 9,1 % à Differdange. Differdange compte aussi plus de jeunes de moins de 20 ans (23,7 % contre 21,4 %) et moins de 65 ans et plus (12,2 % contre 14,7 %). Les prix des appartements sont proches (7 325 €/m² à Esch, 7 198 €/m² à Differdange), Esch étant un peu plus proche de la ville de Luxembourg (17,1 km contre 20,4 km).",
+   "communes": [
+    "0204",
+    "0202"
+   ],
+   "figures": [
+    {
+     "commune": "0204",
+     "indicator": "pop",
+     "value": 38275,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "pop",
+     "value": 31421,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "density",
+     "value": 2667,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "density",
+     "value": 1417,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "pop_growth_10y",
+     "value": 12.8,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "pop_growth_10y",
+     "value": 26.7,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "unemployment_rate",
+     "value": 10.8,
+     "year": 2025
+    },
+    {
+     "commune": "0202",
+     "indicator": "unemployment_rate",
+     "value": 9.1,
+     "year": 2025
+    },
+    {
+     "commune": "0204",
+     "indicator": "under20_share",
+     "value": 21.4,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "under20_share",
+     "value": 23.7,
+     "year": 2026
+    },
+    {
+     "commune": "0204",
+     "indicator": "over65_share",
+     "value": 14.7,
+     "year": 2026
+    },
+    {
+     "commune": "0202",
+     "indicator": "over65_share",
+     "value": 12.2,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "statec_pop",
+    "statec_density",
+    "statec_labour",
+    "rnpp",
+    "habitat",
+    "act"
+   ],
+   "followup": "Quelles communes proches d'Esch ont des prix au m² plus bas ?"
+  },
+  "q5": {
+   "text": "Selon la part des 65 ans et plus, Mondorf-les-Bains arrive en tête avec 25,8 % de résidents âgés. Viennent ensuite Niederanven (23,1 %), Remich (22,7 %), Mondercange (21,3 %) et Diekirch (20,7 %). Ce sont des statistiques de 2026 par commune, qui décrivent la structure par âge sans jugement de valeur.",
+   "communes": [
+    "1204",
+    "0305",
+    "1205",
+    "0208",
+    "0603"
+   ],
+   "figures": [
+    {
+     "commune": "1204",
+     "indicator": "over65_share",
+     "value": 25.8,
+     "year": 2026
+    },
+    {
+     "commune": "0305",
+     "indicator": "over65_share",
+     "value": 23.1,
+     "year": 2026
+    },
+    {
+     "commune": "1205",
+     "indicator": "over65_share",
+     "value": 22.7,
+     "year": 2026
+    },
+    {
+     "commune": "0208",
+     "indicator": "over65_share",
+     "value": 21.3,
+     "year": 2026
+    },
+    {
+     "commune": "0603",
+     "indicator": "over65_share",
+     "value": 20.7,
+     "year": 2026
+    }
+   ],
+   "sources": [
+    "rnpp"
+   ],
+   "followup": "Quelles communes ont la population la plus jeune ?"
+  },
+  "q6": {
+   "text": "Le chômage le plus bas se trouve dans trois communes à égalité : Heffingen, Nommern et Weiler-la-Tour, avec 2,5 %. Viennent ensuite Saeul et Schieren, à 2,9 %. Ce sont des statistiques communales, à interpréter avec prudence, surtout pour les petites communes.",
+   "communes": [
+    "0405",
+    "0410",
+    "0311",
+    "0707",
+    "0609"
+   ],
+   "figures": [
+    {
+     "commune": "0405",
+     "indicator": "unemployment_rate",
+     "value": 2.5,
+     "year": 2025
+    },
+    {
+     "commune": "0410",
+     "indicator": "unemployment_rate",
+     "value": 2.5,
+     "year": 2025
+    },
+    {
+     "commune": "0311",
+     "indicator": "unemployment_rate",
+     "value": 2.5,
+     "year": 2025
+    },
+    {
+     "commune": "0707",
+     "indicator": "unemployment_rate",
+     "value": 2.9,
+     "year": 2025
+    },
+    {
+     "commune": "0609",
+     "indicator": "unemployment_rate",
+     "value": 2.9,
+     "year": 2025
+    }
+   ],
+   "sources": [
+    "statec_labour"
+   ],
+   "followup": "Et où le chômage est-il le plus élevé ?"
+  }
+ }
+}
