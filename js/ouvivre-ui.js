@@ -29,6 +29,12 @@ const LIMITS_FR = {
 const fresh = () => ({ hub: null, size: 70, tenure: "rent", sort: "left", timeValue: 0, countries: new Set(COUNTRIES), selected: null, shown: PAGE });
 let S = fresh();
 export function resetOuvivre() { S = fresh(); }
+// "Où vivre depuis ici ?": open the home with this place selected (its country kept in the filter).
+export function preselectOuvivre(id) {
+  S.selected = id;
+  const c = id.slice(0, 2).toUpperCase();
+  if (COUNTRIES.includes(c)) S.countries = new Set([...S.countries, c]);
+}
 export const ouvivreState = () => S;
 
 const loc = (lang) => (lang === "fr" ? "fr-LU" : "en-GB");
@@ -50,7 +56,7 @@ function pressed(b, on) { b.setAttribute("aria-pressed", String(on)); return b; 
 
 export function effectiveSort() { return S.tenure === "buy" && S.sort === "left" ? "housing" : S.sort; }
 
-export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onChange }) {
+export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onChange, teaser }) {
   const lang = getLang();
   const ov = data.ouvivre;
   const srcName = (id) => ov.sources[id]?.name || id;
@@ -113,7 +119,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const hubs = h("div", "ov-opts");
     hubs.setAttribute("role", "group");
     hubs.setAttribute("aria-label", t("ov.hub"));
-    for (const id of HUBS) hubs.append(pressed(btn("ov-opt", t(`hub.${id}`), () => changed({ hub: id, selected: null, shown: PAGE })), S.hub === id));
+    for (const id of HUBS) hubs.append(pressed(btn("ov-opt", t(`hub.${id}`), () => { changed({ hub: id, shown: PAGE }); if (S.selected) select(S.selected, true); }), S.hub === id));
     const sizes = h("div", "ov-opts");
     sizes.setAttribute("role", "group");
     sizes.setAttribute("aria-label", t("ov.situation"));
@@ -275,8 +281,8 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
 
   function drawIdleMap() {
     const status = new Map(ov.places.map((p) => [p.id, "ranked"]));
-    grmap.update({ status, labels: [] });
-    grmap.select(null);
+    grmap.update({ status, labels: S.selected ? [S.selected] : [] });
+    grmap.select(S.selected);
   }
 
   function drawLegend() {
@@ -375,6 +381,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     }
     det.append(sl);
     f.append(det);
+    if (teaser) f.append(teaser());
     return f;
   }
 

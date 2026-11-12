@@ -1,3 +1,5 @@
+import { PAGES } from "./i18n-pages.js";
+
 const DICT = {
   en: {
     byline: "by Beyond Data",
@@ -268,6 +270,8 @@ const DICT = {
     open_ask: "Interroger les données sur {name}",
   },
 };
+
+for (const l of ["en", "fr"]) Object.assign(DICT[l], PAGES[l]);
 
 function initial() {
   const p = new URLSearchParams(location.search).get("lang");

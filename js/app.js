@@ -8,7 +8,9 @@ import { createGrMap } from "./grmap.js";
 import { applyStatic, getLang, setLang, t, tl } from "./i18n.js";
 import { createMap } from "./map.js";
 import { comparisons } from "./ouvivre.js";
-import { ouvivreState, renderOuvivre, resetOuvivre } from "./ouvivre-ui.js";
+import { ouvivreState, preselectOuvivre, renderOuvivre, resetOuvivre } from "./ouvivre-ui.js";
+import { renderCompare } from "./compare.js";
+import { problemsTeaser, renderCountry, renderPlace, renderSources } from "./pages.js";
 
 const panel = document.getElementById("panel");
 const lead = document.getElementById("lead");
@@ -71,19 +73,11 @@ function go(hash) {
   route();
 }
 
-function renderCountry() {
-  panel.replaceChildren();
-  const hero = h("div", "lm-hero");
-  hero.append(h("p", "eyebrow", t("eyebrow")), h("h1", null, t("tagline")), h("p", "lead", t("tap")));
-  const ask = h("button", "btn primary lm-big", t("ask.title"));
-  ask.type = "button";
-  ask.onclick = () => go("#/ask");
-  panel.append(hero, ask, h("p", "muted small", t("built")));
-  map.clear();
-}
-
-function setView(home) {
+// mode: "home" (Greater Region map + choices), "map" (LU map + panel), "full" (panel only, full width)
+function setView(mode) {
+  const home = mode === "home";
   mainEl.classList.toggle("is-home", home);
+  mainEl.classList.toggle("is-full", mode === "full");
   lead.hidden = !home;
   grSvg.toggleAttribute("hidden", !home); // SVG elements have no .hidden property: set the attribute
   legend.hidden = !home;
@@ -91,32 +85,64 @@ function setView(home) {
   const cur = (id, on) => { const el = document.getElementById(id); if (on) el.setAttribute("aria-current", "page"); else el.removeAttribute("aria-current"); };
   cur("nav-where", home);
   cur("nav-ask", location.hash.startsWith("#/ask"));
+  document.querySelectorAll(".lm-foot a[href]").forEach((a) => {
+    if (location.hash.startsWith(a.getAttribute("href"))) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
+  });
 }
 
+let seq = 0;
 function route() {
   attract.stop();
   homeAttract.stop();
   assistant?.dispose();
   assistant = null;
-  const [, view, arg] = (location.hash || "#/").split("/");
-  const home = !view;
-  setView(home);
+  const my = ++seq;
+  const isCurrent = () => my === seq;
+  let parts = (location.hash || "#/").split("/");
+  if (parts[1] === "from" && parts[2]) {
+    // "Where to live from here?": home with this place selected
+    preselectOuvivre(decodeURIComponent(parts[2]));
+    history.replaceState(null, "", "#/");
+    parts = ["#", ""];
+  }
+  const [, view, arg] = parts;
+  const place = view === "p" ? st.ouvivre.places.find((x) => x.id === decodeURIComponent(arg || "")) : null;
+  if (place?.lau && st.byLau.has(place.lau)) { history.replaceState(null, "", `#/c/${place.lau}`); route(); return; }
   if (view === "c" && st.byLau.has(arg)) {
+    setView("map");
     const c = st.byLau.get(arg);
     map.highlight({ focus: [c.lau], twins: c.twins });
-    renderCommune(panel, c, { onSelect: (l) => go(`#/c/${l}`), onAsk: (l) => go(`#/ask/${l}`) });
+    renderCommune(panel, c, {
+      tab: parts[3], go, isCurrent,
+      onSelect: (l) => go(`#/c/${l}`), onAsk: (l) => go(`#/ask/${l}`),
+      onTab: (k) => history.replaceState(null, "", `#/c/${c.lau}/${k}`),
+    });
   } else if (view === "ask") {
+    setView("map");
     map.clear();
     assistant = renderAssistant(panel, { lau: st.byLau.has(arg) ? arg : null, map, onSelect: (l) => go(`#/c/${l}`) });
   } else if (view === "pays") {
-    renderCountry();
+    setView("map");
+    map.clear();
+    renderCountry(panel, { onAsk: () => go("#/ask") });
     if (!VIDEO && (KIOSK || wide.matches)) attract.start();
+  } else if (place) {
+    setView("full");
+    renderPlace(panel, place, { go });
+  } else if (view === "compare") {
+    setView("full");
+    renderCompare(panel, parts.slice(2).filter(Boolean), { go });
+  } else if (view === "sources") {
+    setView("full");
+    renderSources(panel);
   } else {
+    setView("home");
     grmap.clear();
     ovView = renderOuvivre({
       lead, panel, legend, data: st, grmap,
       onCommune: (l) => go(`#/c/${l}`),
       onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); } },
+      teaser: problemsTeaser,
     });
     if (!VIDEO && KIOSK && !ouvivreState().hub) { grmap.resetAttract(); homeAttract.start(); }
   }
