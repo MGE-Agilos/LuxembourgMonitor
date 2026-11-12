@@ -76,7 +76,8 @@ export function renderAssistant(el, { lau, map, onSelect }) {
   });
 
   const answer = h("div");
-  el.replaceChildren(title, intro, sugg, form, answer);
+  const privacy = h("p", "lm-sub", t("ask.privacy"));
+  el.replaceChildren(title, intro, sugg, form, privacy, answer);
 
   let seq = 0;
   let disposed = false;
