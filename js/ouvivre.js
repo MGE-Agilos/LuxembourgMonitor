@@ -1,7 +1,9 @@
 // "Où vivre ?" — pure computations over data/ouvivre.json (no DOM, testable with node --test).
 // Formulas (plan B1): monthly rent = rent_m2 × size; purchase = sale_price_m2 × size;
 // share of the Luxembourg reference net salary; hours/month = 2 × minutes × days / 12 / 60;
-// left to live = net LU − rent (commute cost left out while assumptions.commute_cost_per_km_eur is null).
+// fuel cost/month = 2 × road km × working days / 12 × consumption / 100 × pump price (assumptions);
+// left to live (rent) = net LU − rent − fuel cost; null when the place has no car route (no number invented).
+// Cross-border transit fares are not collected: noted, never counted. No rent-by-size source exists: no size factor.
 
 export const HUBS = ["kirchberg", "lux-gare", "cloche-dor", "belval", "findel"];
 export const SIZES = [50, 70, 90];
@@ -14,10 +16,18 @@ export function hoursPerMonth(minutes, days = 220) {
   return (2 * minutes * days) / 12 / 60;
 }
 
+export function fuelCostMonth(km, days, consumptionL100, pricePerL) {
+  if (num(km) === null || num(days) === null || num(consumptionL100) === null || num(pricePerL) === null) return null;
+  return (2 * km * days * (consumptionL100 / 100) * pricePerL) / 12;
+}
+
 export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = "rent" } = {}) {
   const net = num(data?.reference?.net_monthly_lu);
-  const days = num(data?.assumptions?.commute_days_per_year) ?? 220;
-  const perKm = num(data?.assumptions?.commute_cost_per_km_eur);
+  const A = data?.assumptions || {};
+  const days = num(A.commute_days_per_year) ?? 220;
+  const workDays = num(A.working_days_per_year) ?? days;
+  const consumption = num(A.consumption_l_per_100km);
+  const fuelPrice = num(A.fuel_price_eur_per_l);
   return (data?.places || []).map((p) => {
     const notes = [];
     const rentM2 = num(p.rent_m2);
@@ -40,7 +50,8 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       else if (p.country === "FR") notes.push("no_sale_moselle");
       else notes.push("price_not_published");
     }
-    if (p.country === "FR" && tenure === "rent" && rent_month !== null) notes.push("rent_charges_included");
+    if (p.country === "FR" && tenure === "rent" && rent_month !== null) notes.push("rent_charges_included", "rent_size_fr");
+    if (p.country === "LU" && tenure === "rent" && rent_month !== null && size_m2 > 50) notes.push("rent_size_lu");
     if (!c) notes.push("commute_not_published");
     else if (transit_min === null) notes.push("transit_not_published");
 
@@ -51,14 +62,14 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       if (tenure === "rent") share_of_lu_net = rent_month / net;
       else years_of_lu_net = price_total / (net * 12);
     }
-    let commute_cost_month = null;
-    if (perKm !== null && car_km !== null) commute_cost_month = (2 * car_km * days * perKm) / 12;
-    else if (c) notes.push("commute_cost_not_counted");
+    const fuel_cost_month = fuelCostMonth(car_km, workDays, consumption, fuelPrice);
+    if (c && p.country !== "LU") notes.push("transit_cost_not_counted");
 
     // Left to live is only defined for renting: a purchase has no monthly cost without a mortgage assumption.
     let left_month = null;
     if (tenure === "rent" && net !== null && rent_month !== null) {
-      left_month = Math.round(net - rent_month - (commute_cost_month ?? 0));
+      if (fuel_cost_month === null) notes.push("no_car_route");
+      else left_month = Math.round(net - rent_month - fuel_cost_month);
     } else if (tenure === "buy") notes.push("left_rent_only");
 
     return {
@@ -87,7 +98,7 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       hours_month_car: hoursPerMonth(car_min, days),
       hours_month_transit: hoursPerMonth(transit_min, days),
       hours_month_transit_p80: hoursPerMonth(transit_p80, days),
-      commute_cost_month,
+      fuel_cost_month,
       left_month,
       src: p.src || {},
       notes,

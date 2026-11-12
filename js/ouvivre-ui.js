@@ -17,6 +17,13 @@ const LIMITS_FR = {
   "No commute times and no rents for Belgium; German rents not comparable":
     "Ni temps de trajet ni loyers pour la Belgique ; loyers allemands non comparables",
   "Belgian prices are medians per sale (not per m2)": "Prix belges : médianes par vente (pas au m²)",
+  [`Commute cost = fuel only (monthly average pump price, 6.5 L/100 km, 220 days); cross-border transit fares, parking and car wear are not counted`]:
+    "Coût du trajet = carburant seulement (prix moyen mensuel à la pompe, 6,5 L/100 km, 220 jours) ; titres de transport "
+    + "transfrontaliers, parking et usure de la voiture non comptés",
+  [`Rent per m2 is multiplied by the chosen size without size correction: Luxembourg advertised flats average about 42 m2, so rents for 70 and 90 m2 may be overstated (per-m2 rent is usually lower for larger flats)`]:
+    "Le loyer au m² est multiplié par la surface choisie sans correction : les appartements annoncés au Luxembourg font "
+    + "en moyenne environ 42 m², les loyers de 70 et 90 m² peuvent donc être surestimés (le loyer au m² baisse en général "
+    + "avec la surface)",
 };
 
 const fresh = () => ({ hub: null, size: 70, tenure: "rent", sort: "left", countries: new Set(COUNTRIES), selected: null, shown: PAGE });
@@ -131,6 +138,11 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const housingSrcId = S.tenure === "rent" ? p.src.rent_m2 : p.src.sale_price_m2;
     const housingSrc = housingSrcId ? { name: srcName(housingSrcId), url: srcUrl(housingSrcId) } : null;
     const commuteSrc = p.src.commute ? { name: srcName(p.src.commute), url: srcUrl(p.src.commute) } : null;
+    const A = ov.assumptions;
+    const fuelSrc = p.fuel_cost_month === null ? null : {
+      name: `${t("d.fuel")} : ${eur(p.fuel_cost_month, lang)} (${t("d.fuel_basis", {
+        l: num(A.consumption_l_per_100km, lang, 1), d: A.working_days_per_year, p: num(A.fuel_price_eur_per_l, lang, 3), m: A.fuel_price_period })}) — ${srcName(A.fuel_price_source)}`,
+      url: srcUrl(A.fuel_price_source) };
     const nums = h("div", "ov-nums");
     if (S.tenure === "rent") {
       nums.append(figure(el, t("k.rent"), p.rent_month === null ? null : eur(p.rent_month, lang),
@@ -145,7 +157,8 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
         t("s.hours", { h: num(p.hours_month_car, lang, 0) })], [commuteSrc]));
     if (S.tenure === "rent") {
       nums.append(figure(el, t("k.left"), p.left_month === null ? null : eur(p.left_month, lang),
-        [p.left_month === null ? null : t("s.left")], [p.left_month === null ? null : housingSrc, p.left_month === null ? null : sal]));
+        [p.left_month === null ? null : t("s.left"), p.left_month === null || p.hours_month_car === null ? null : t("s.hours", { h: num(p.hours_month_car, lang, 0) })],
+        [p.left_month === null ? null : housingSrc, p.left_month === null ? null : sal, p.left_month === null ? null : fuelSrc]));
     } else {
       const f = figure(el, t("k.left"), "—", [t("s.left_buy")], []);
       nums.append(f);
@@ -161,6 +174,8 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     detailRow(dl, t("d.workers"), p.workers === null ? null : num(p.workers, lang));
     detailRow(dl, t("d.dist"), p.dist_lux_km === null ? null : `${num(p.dist_lux_km, lang, 1)} km`);
     detailRow(dl, t("d.road", { hub: t(`hub.${S.hub}`) }), p.car_km === null ? null : `${num(p.car_km, lang, 1)} km`);
+    detailRow(dl, t("d.fuel"), p.fuel_cost_month === null ? null : `${eur(p.fuel_cost_month, lang)} (${t("d.fuel_basis", {
+      l: num(A.consumption_l_per_100km, lang, 1), d: A.working_days_per_year, p: num(A.fuel_price_eur_per_l, lang, 3), m: A.fuel_price_period })})`);
     detailRow(dl, t("d.hours_car"), p.hours_month_car === null ? null : `${num(p.hours_month_car, lang, 0)} h`);
     detailRow(dl, t("d.hours_tc"), p.hours_month_transit === null ? null
       : `${num(p.hours_month_transit, lang, 0)} h (${p.hours_month_transit_p80 === null ? "–" : num(p.hours_month_transit_p80, lang, 0)} h)`);
