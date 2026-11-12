@@ -30,7 +30,11 @@ try {
 
 const map = createMap(luSvg, st.carte, { onSelect: (lau) => go(`#/c/${lau}`), communes: st.communes });
 let ovView = null;
-const grmap = createGrMap(grSvg, { places: st.ouvivre.places, carte: st.carte, onSelect: (id) => ovView?.select(id) });
+const grmap = createGrMap(grSvg, {
+  places: st.ouvivre.places, carte: st.carte, onSelect: (id) => ovView?.select(id),
+  getHub: () => ouvivreState().hub,
+  onUserMode: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); } }, // a tap on km/minutes ends the attract loop
+});
 const attract = createAttract(document.getElementById("attract"), map, st.faits, { intervalMs: FACT_MS });
 
 // Home attract: striking comparisons computed from ouvivre.json, interleaved with the existing facts.
@@ -52,7 +56,12 @@ function homeFacts() {
   }
   return out;
 }
-const homeAttract = createAttract(document.getElementById("attract"), grmap, homeFacts(), { intervalMs: FACT_MS, cta: "ov.q" });
+// Each attract step also alternates the map: km, minutes by car, minutes by public transport (plan B2).
+const grAttract = {
+  highlight: (g) => { grmap.attractStep(); grmap.highlight(g); },
+  clear: () => { grmap.attractStep(); grmap.clear(); },
+};
+const homeAttract = createAttract(document.getElementById("attract"), grAttract, homeFacts(), { intervalMs: FACT_MS, cta: "ov.q" });
 
 const wide = matchMedia("(min-width: 900px)");
 let assistant = null;
@@ -107,9 +116,9 @@ function route() {
     ovView = renderOuvivre({
       lead, panel, legend, data: st, grmap,
       onCommune: (l) => go(`#/c/${l}`),
-      onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); } },
+      onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); } },
     });
-    if (!VIDEO && KIOSK && !ouvivreState().hub) homeAttract.start();
+    if (!VIDEO && KIOSK && !ouvivreState().hub) { grmap.resetAttract(); homeAttract.start(); }
   }
   panel.scrollTop = 0;
   if (!wide.matches) window.scrollTo(0, 0);

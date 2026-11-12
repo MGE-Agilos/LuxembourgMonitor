@@ -188,3 +188,32 @@ body.kiosk { font-size: 17px; user-select: none; -webkit-user-select: none; }
   .ov-v { font-size: 19px; }
   .lm-mapwrap:has(.lm-attract:not([hidden])) #grmap { margin-bottom: 0; }
 }
+
+/* ---------- Map in minutes (plan B2) ---------- */
+.gr-modes { order: -1; display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; width: 100%; margin-bottom: 6px; }
+#grmap[hidden] + .gr-modes { display: none; }
+.gr-seg { padding: 2px; }
+.gr-seg button { min-height: 40px; padding: 4px 14px; font-size: 14px; }
+.gr-seg[hidden], .gr-modes-note[hidden] { display: none; }
+.gr-modes-note { flex-basis: 100%; margin: 0; display: flex; flex-wrap: wrap; gap: 2px 14px; font-size: 13px; color: var(--ink-2); }
+.gr-sw-notime { background: var(--mark); opacity: .5; }
+.gr-sw-ring { background: none; border: 1.5px dashed var(--mark-2); border-radius: 50%; }
+.gr-lu { fill-rule: evenodd; }
+.gr-countries, .gr-cnames { transition: opacity .6s; }
+#grmap.is-min .gr-countries, #grmap.is-min .gr-cnames { opacity: 0; }
+.gr-rings { pointer-events: none; }
+.gr-ring { fill: none; stroke: var(--mark-2); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.gr-ring-label { font: 600 12px var(--f-mono); fill: var(--ink-2); stroke: var(--paper); stroke-width: 4px; paint-order: stroke; }
+.gr-hub { pointer-events: none; }
+.gr-hub-mk { fill: var(--navy); stroke: var(--paper); stroke-width: 2; }
+.gr-hub-name { font: 800 14px var(--f-body); fill: var(--ink); stroke: var(--paper); stroke-width: 4px; paint-order: stroke; stroke-linejoin: round; }
+.gr-lu[data-nt], [data-nt] > .gr-pt { fill: var(--mark); opacity: .5; }
+@media (prefers-color-scheme: dark) { .gr-hub-mk { fill: var(--cyan); } }
+@media (prefers-reduced-motion: reduce) { .gr-countries, .gr-cnames { transition: none; } }
+@media (max-width: 899px) {
+  .gr-seg button { min-height: 44px; padding: 4px 10px; font-size: 13.5px; }
+}
+@media (max-width: 899px) {
+  .gr-ring-label { font-size: 17px; }
+  .gr-hub-name { font-size: 18px; }
+}
