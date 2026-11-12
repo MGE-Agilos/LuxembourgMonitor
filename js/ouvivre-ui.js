@@ -885,7 +885,8 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
 
   // Esc closes the detail drawer / sheet (unless the chat bubble or a dialog is open)
   escHandler = () => {
-    if (!S.detail || !panel.isConnected || lead.hidden || document.body.classList.contains("chat-open") || document.querySelector("dialog[open]")) return false;
+    if (!S.detail || !panel.isConnected || lead.hidden || document.body.classList.contains("chat-open") || document.body.classList.contains("tour-open")
+      || document.querySelector("dialog[open]")) return false;
     closeDetail();
     return true;
   };

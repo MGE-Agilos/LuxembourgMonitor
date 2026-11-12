@@ -1,3 +1,4 @@
+import { HELP } from "./i18n-help.js";
 import { PAGES } from "./i18n-pages.js";
 
 const DICT = {
@@ -379,7 +380,7 @@ const DICT = {
   },
 };
 
-for (const l of ["en", "fr"]) Object.assign(DICT[l], PAGES[l]);
+for (const l of ["en", "fr"]) Object.assign(DICT[l], PAGES[l], HELP[l]);
 
 function initial() {
   const p = new URLSearchParams(location.search).get("lang");

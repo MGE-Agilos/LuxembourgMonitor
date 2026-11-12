@@ -5,12 +5,14 @@ import { FACT_MS, IDLE_MS, KIOSK, VIDEO } from "./config.js";
 import { displayName, findCommune, loadData } from "./data.js";
 import { h } from "./dom.js";
 import { createGrMap } from "./grmap.js";
+import { createHelp } from "./help.js";
 import { applyStatic, getLang, setLang, t, tl } from "./i18n.js";
 import { createMap } from "./map.js";
 import { comparisons } from "./ouvivre.js";
 import { ouvivreContext, ouvivreState, preselectOuvivre, renderOuvivre, resetOuvivre } from "./ouvivre-ui.js";
 import { renderCompare } from "./compare.js";
 import { renderCountry, renderPlace, renderSources } from "./pages.js";
+import { TOUR_KEY, createTour, shouldAutoStart } from "./tour.js";
 
 const panel = document.getElementById("panel");
 const lead = document.getElementById("lead");
@@ -91,6 +93,52 @@ const chat = createChat({
   onOpen: () => { attract.stop(); if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); } },
 });
 let lastPage = "#/";
+const isHome = () => !location.hash || location.hash === "#/";
+
+// Help guide ("?" of the top bar) and guided tour (successive pop-ups over the home)
+function stopHomeAttract() {
+  attract.stop();
+  if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); }
+}
+const tour = createTour({
+  t,
+  isPhone: () => !wide.matches,
+  async prepare() {
+    help.close({ restoreFocus: false });
+    if (chat.isOpen()) chat.close({ restoreFocus: false });
+    if (!isHome()) go("#/");
+    await new Promise((r) => requestAnimationFrame(() => r()));
+    // the anchors live on the ranking tab, with the controls unfolded and no detail drawer over the table
+    document.querySelector('#ov-tab-rank[aria-selected="false"]')?.click();
+    document.querySelector('[data-fk="drawer-close"]')?.click();
+    if (document.querySelector("#lead .ov-ctrls.is-closed")) document.querySelector("#lead .ov-ctrl-toggle")?.click();
+    stopHomeAttract();
+  },
+  onStart() {
+    stopHomeAttract();
+    autoDone = true;
+    try { localStorage.setItem(TOUR_KEY, "1"); } catch { /* storage unavailable: in-memory flag only */ }
+  },
+});
+const help = createHelp({ onTour: () => tour.start() });
+
+// Auto-start once on the first visit of the home (never on the kiosk nor in the video mode); ?tour=1 forces it.
+let forceTour = new URLSearchParams(location.search).get("tour") === "1";
+let autoDone = false;
+let autoTimer = null;
+function tourSeen() {
+  try { return localStorage.getItem(TOUR_KEY) === "1"; } catch { return false; }
+}
+function maybeAutoTour() {
+  if (autoTimer || tour.isOpen() || (autoDone && !forceTour)) return;
+  if (!shouldAutoStart({ kiosk: KIOSK, video: VIDEO, forced: forceTour, seen: tourSeen() })) return;
+  autoTimer = setTimeout(() => {
+    autoTimer = null;
+    if (!isHome() || tour.isOpen() || chat.isOpen() || document.querySelector("dialog[open]")) return;
+    forceTour = false;
+    tour.start();
+  }, 700);
+}
 
 function go(hash) {
   if (location.hash !== hash) history.pushState(null, "", hash);
@@ -115,6 +163,7 @@ function setView(mode) {
 
 let seq = 0;
 function route() {
+  if (tour.isOpen() && !isHome()) tour.stop();
   attract.stop();
   homeAttract.stop();
   const my = ++seq;
@@ -169,7 +218,8 @@ function route() {
       onCommune: (l) => go(`#/c/${l}`), go, onAsk: () => chat.open(),
       onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); } chat.refresh(); },
     });
-    if (!VIDEO && KIOSK && !ouvivreState().touched) { grmap.resetAttract(); homeAttract.start(); }
+    if (!VIDEO && KIOSK && !ouvivreState().touched && !tour.isOpen()) { grmap.resetAttract(); homeAttract.start(); }
+    maybeAutoTour();
   }
   panel.scrollTop = 0;
   if (!wide.matches) window.scrollTo(0, 0);
@@ -196,7 +246,9 @@ document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("clic
   fillList();
   map.relabel(getLang());
   grmap.relabel(getLang());
+  help.relabel();
   route();
+  tour.relabel();
 }));
 
 // The nav "Ask" link opens the bubble (its href #/ask still works without JS routing)
@@ -209,6 +261,8 @@ if (KIOSK && !VIDEO) {
   setInterval(() => {
     const home = !location.hash || location.hash === "#/";
     if (Date.now() - last <= IDLE_MS) return;
+    tour.stop();
+    help.close({ restoreFocus: false });
     if (chat.isOpen() || chat.hasThread()) { chat.close({ restoreFocus: false }); chat.reset(); }
     if (!home) { resetOuvivre(); go("#/"); } else if (ouvivreState().touched || !homeAttract.running()) { resetOuvivre(); route(); }
   }, 5000);
@@ -227,5 +281,9 @@ window.LM = {
     return chat.typeAndAsk(question, suggestionId);
   },
   chat,
+  // promo video / checks: LM.tour() starts the guided tour, LM.tour(false) closes it
+  tour: (start = true) => (start ? tour.start() : (tour.stop(), false)),
+  tourCtl: tour,
+  help,
   ready: true,
 };
