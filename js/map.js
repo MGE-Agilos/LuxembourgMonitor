@@ -1,4 +1,6 @@
 /* global d3 */
+import { displayName } from "./data.js";
+import { getLang } from "./i18n.js";
 export function createMap(svg, carte, { onSelect, communes = [] }) {
   const W = 600, H = 760;
   const sel = d3.select(svg).attr("viewBox", `0 0 ${W} ${H}`).attr("preserveAspectRatio", "xMidYMid meet");
@@ -16,7 +18,12 @@ export function createMap(svg, carte, { onSelect, communes = [] }) {
     .attr("data-lau", (d) => d.properties.lau)
     .attr("style", (d) => { const b = baseFor(d.properties.lau); return b ? `--base: ${b}` : null; })
     .on("click", (_e, d) => onSelect(d.properties.lau));
-  paths.append("title").text((d) => d.properties.name);
+  const titles = paths.append("title");
+  const byLau = new Map(communes.map((c) => [c.lau, c]));
+  function relabel(lang = getLang()) {
+    titles.text((d) => { const c = byLau.get(d.properties.lau); return c ? displayName(c, lang) : d.properties.name; });
+  }
+  relabel();
 
   // groups: { focus: [lau], twins: [lau], answer: [lau] } — first group wins for a commune.
   function highlight(groups) {
@@ -25,5 +32,5 @@ export function createMap(svg, carte, { onSelect, communes = [] }) {
     sel.classed("has-hl", cls.size > 0);
     paths.attr("data-hl", (d) => cls.get(d.properties.lau) || null);
   }
-  return { highlight, clear: () => highlight({}) };
+  return { highlight, relabel, clear: () => highlight({}) };
 }

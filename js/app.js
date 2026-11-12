@@ -43,6 +43,7 @@ function renderHome() {
 
 function route() {
   attract.stop();
+  assistant?.dispose();
   assistant = null;
   const [, view, arg] = (location.hash || "#/").split("/");
   if (view === "c" && st.byLau.has(arg)) {
@@ -77,13 +78,14 @@ document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("clic
   setLang(b.dataset.lang);
   applyStatic();
   fillList();
+  map.relabel(getLang());
   route();
 }));
 
 // Kiosk: back to the attract screen after IDLE_MS without interaction
-if (KIOSK) {
+if (KIOSK && !VIDEO) {
   let last = Date.now();
-  for (const ev of ["pointerdown", "keydown", "touchstart"]) addEventListener(ev, () => { last = Date.now(); }, { passive: true });
+  for (const ev of ["pointerdown", "keydown", "touchstart", "wheel", "scroll"]) addEventListener(ev, () => { last = Date.now(); }, { passive: true, capture: true });
   setInterval(() => {
     const home = !location.hash || location.hash === "#/";
     if (!home && Date.now() - last > IDLE_MS) go("#/");

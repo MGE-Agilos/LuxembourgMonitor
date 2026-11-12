@@ -17,7 +17,10 @@ function tile(c, id, lang) {
   } else if (!v && id === "appt_price_m2") {
     sub.textContent = t("fewads");
   } else if (v && c.ranks[id]) {
-    sub.textContent = `${t(c.ranks[id] === 1 ? "rank1" : "rank", { r: c.ranks[id], n: data().meta.counts[id] })} · ${v.y}`;
+    const n = data().meta.counts[id], r = c.ranks[id];
+    const k = r > n / 2 ? n - r + 1 : r;
+    const key = (r > n / 2 ? "rankLow" : "rank") + (k === 1 ? "1" : "");
+    sub.textContent = `${t(key, { r: k, n })} · ${v.y}`;
   }
   card.append(sub);
   return card;
@@ -60,8 +63,14 @@ export function renderCommune(el, c, { onSelect, onAsk }) {
 
   const qrbox = h("div", "lm-qrbox");
   const qr = h("div", "lm-qr");
-  new QRCode(qr, { text: `${PUBLIC_URL}#/c/${c.lau}`, width: 120, height: 120, colorDark: "#030649", colorLight: "#ffffff" });
+  let qrOk = false;
+  try {
+    if (typeof QRCode !== "undefined") {
+      new QRCode(qr, { text: `${PUBLIC_URL}#/c/${c.lau}`, width: 120, height: 120, colorDark: "#030649", colorLight: "#ffffff" });
+      qrOk = true;
+    }
+  } catch (err) { console.warn("QR unavailable", err); }
   qrbox.append(qr, h("p", "muted small", t("scan", { name })));
 
-  el.replaceChildren(head, tiles, twins, notes, ask, qrbox);
+  el.replaceChildren(head, tiles, twins, notes, ask, ...(qrOk ? [qrbox] : []));
 }

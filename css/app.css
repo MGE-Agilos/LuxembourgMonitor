@@ -19,9 +19,9 @@ body.kiosk { font-size: 17px; user-select: none; -webkit-user-select: none; }
 
 .lm-commune { fill: var(--base, var(--surface-2)); stroke: var(--surface); stroke-width: .8; cursor: pointer;
   transition: fill .5s, opacity .5s; }
-.lm-commune:hover { stroke: var(--navy); stroke-width: 1.4; }
+.lm-commune:hover { stroke: var(--ink); stroke-width: 1.4; }
 .has-hl .lm-commune:not([data-hl]) { opacity: .45; }
-.lm-commune[data-hl] { stroke: var(--navy); stroke-width: 1.6; }
+.lm-commune[data-hl] { stroke: var(--ink); stroke-width: 1.6; }
 .lm-commune[data-hl="focus"] { fill: var(--violet); }
 .lm-commune[data-hl="twins"] { fill: var(--mint); }
 .lm-commune[data-hl="answer"] { fill: var(--cyan); animation: lm-pulse 1.4s ease-in-out 2; }

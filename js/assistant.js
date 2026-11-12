@@ -8,17 +8,28 @@ async function loadFallback() {
   if (fallback) return fallback;
   try {
     const r = await fetch("fallback/answers.json");
-    fallback = r.ok ? await r.json() : {};
+    if (!r.ok) return {};
+    fallback = await r.json();
   } catch {
-    fallback = {};
+    return {};
   }
   return fallback;
 }
 
-export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = ASK_TIMEOUT_MS } = {}) {
+export function isValid(res) {
+  return !!res && typeof res.text === "string"
+    && (res.communes === undefined || (Array.isArray(res.communes) && res.communes.every((x) => typeof x === "string")))
+    && (res.figures === undefined || (Array.isArray(res.figures) && res.figures.every((f) => f && typeof f.value === "number")));
+}
+
+export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = ASK_TIMEOUT_MS, signal } = {}) {
   if (!url) throw new Error("offline");
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+  if (signal) {
+    if (signal.aborted) ctrl.abort();
+    else signal.addEventListener("abort", () => ctrl.abort(), { once: true });
+  }
   try {
     const r = await fetch(url, {
       method: "POST",
@@ -28,7 +39,7 @@ export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = A
     });
     if (!r.ok) throw new Error(`http ${r.status}`);
     const j = await r.json();
-    if (!j || typeof j.text !== "string") throw new Error("bad response");
+    if (!isValid(j)) throw new Error("bad response");
     return j;
   } finally {
     clearTimeout(timer);
@@ -68,19 +79,22 @@ export function renderAssistant(el, { lau, map, onSelect }) {
   el.replaceChildren(title, intro, sugg, form, answer);
 
   let seq = 0;
+  let disposed = false;
+  const abort = new AbortController();
   async function run(question, suggestionId) {
     const my = ++seq;
     answer.replaceChildren(h("p", "muted lm-thinking", t("ask.thinking")));
     let res = null;
     if (!VIDEO) {
-      try { res = await askApi(question, lang, lau); } catch { res = null; }
+      try { res = await askApi(question, lang, lau, { signal: abort.signal }); } catch { res = null; }
     }
     if (!res && suggestionId) {
       const fb = await loadFallback();
       res = fb?.[lang]?.[suggestionId] || null;
+      if (!isValid(res)) res = null;
       if (VIDEO && res) await sleep(1800);
     }
-    if (my !== seq) return; // a newer question was asked meanwhile
+    if (my !== seq || disposed) return; // a newer question was asked meanwhile
     if (!res) {
       answer.replaceChildren(h("p", "chip warn", t("ask.offline")));
       return;
@@ -139,5 +153,6 @@ export function renderAssistant(el, { lau, map, onSelect }) {
     return run(question, suggestionId);
   }
 
-  return { run, typeAndAsk };
+  function dispose() { disposed = true; abort.abort(); }
+  return { run, typeAndAsk, dispose };
 }
