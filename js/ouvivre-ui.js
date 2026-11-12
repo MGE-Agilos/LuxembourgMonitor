@@ -913,7 +913,11 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
       const el = wide() ? panel.querySelector(`.ov-table tr[data-id="${CSS.escape(id)}"]`) : null;
       if (el) {
         const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-        el.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: wide() ? "center" : "nearest" });
+        // scroll the table container only: scrollIntoView would also move the overflow:hidden panels above it
+        const wrap = el.closest(".ov-tblwrap");
+        const head = wrap.querySelector("thead")?.offsetHeight || 0;
+        const top = el.offsetTop - head - Math.max(0, (wrap.clientHeight - head - el.offsetHeight) / 2);
+        wrap.scrollTo({ top: Math.max(0, top), behavior: reduce ? "auto" : "smooth" });
       }
     } else draw();
     onChange?.();

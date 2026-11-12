@@ -218,8 +218,8 @@ body.kiosk { font-size: 17px; user-select: none; -webkit-user-select: none; }
 .ov-x-btn:hover { color: var(--ink); background: var(--line); }
 
 /* detail drawer over the right of the table */
-.ov-drawer { position: absolute; z-index: 4; top: 46px; right: 10px; bottom: 10px; width: min(480px, 55%); overflow-y: auto;
-  padding: 14px 18px 16px; gap: 10px; border-color: var(--emph-line); box-shadow: 0 14px 44px rgba(3, 6, 73, .28); overscroll-behavior: contain; }
+.ov-drawer { position: absolute; z-index: 4; top: 0; right: 0; bottom: 0; width: min(480px, 55%); overflow-y: auto;
+  padding: 14px 18px 16px; gap: 10px; border-color: var(--emph-line); box-shadow: -14px 0 32px rgba(3, 6, 73, .22), 0 14px 44px rgba(3, 6, 73, .28); overscroll-behavior: contain; }
 .ov-dhead { display: flex; align-items: center; gap: 10px; }
 .ov-dname { flex: 1; min-width: 0; margin: 0; font: 800 22px/1.15 var(--f-body); }
 .ov-drawer .ov-nums { gap: 10px; }
@@ -566,7 +566,7 @@ body.kiosk .lm-tour-body { font-size: 17px; }
 
 /* Estimates (masked official rent / price): muted italic value + small "est." marker, never a published figure */
 .ov-est { display: inline-block; margin-left: 4px; padding: 0 5px; border: 1px solid var(--line-strong); border-radius: 999px;
-  font: 600 10px/16px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-style: normal; cursor: help; vertical-align: middle; }
+  font: 600 10px/16px var(--f-mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-style: normal; white-space: nowrap; cursor: help; vertical-align: middle; }
 td.is-est, .ov-v.is-est, .cmp-table td:has(> .ov-est) .cmp-v { font-style: italic; color: var(--ink-2); }
 .ov-estnote { font-style: italic; color: var(--ink-2); }
 .ov-off { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--line-strong); background: transparent;
