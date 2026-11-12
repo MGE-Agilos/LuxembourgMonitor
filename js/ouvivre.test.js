@@ -155,3 +155,61 @@ test("real ouvivre.json: every place computes, no NaN", () => {
   }
   assert.ok(comparisons(data).length >= 3);
 });
+
+const estFixture = {
+  reference: { net_monthly_lu: 4000 },
+  assumptions: fixture.assumptions,
+  places: [
+    { id: "lu:1", lau: "1", country: "LU", name: "Official", rent_m2: 30, rent_m2_est: 99, sale_price_m2: 6000, sale_price_m2_est: 99,
+      commute: { kirchberg: { driving: 20, driving_km: 15 } } },
+    { id: "lu:2", lau: "2", country: "LU", name: "Estimated", rent_m2: null, rent_m2_est: 20, rent_est: { method: "canton_mean", canton: "X", n: 3 },
+      sale_price_m2_est: 5000, sale_est: { method: "district_mean" }, commute: { kirchberg: { driving: 30, driving_km: 25 } } },
+    { id: "lu:3", lau: "3", country: "LU", name: "Nothing", commute: { kirchberg: { driving: 10, driving_km: 5 } } },
+  ],
+};
+
+test("estimates: official value wins, estimate fills a masked one, flags and notes are set", () => {
+  const [off, est, none] = computePlaces(estFixture, { size_m2: 70, tenure: "rent" });
+  assert.equal(off.rent_month, 2100);
+  assert.equal(off.rent_estimated, false);
+  assert.ok(!off.notes.some((n) => n.startsWith("rent_estimate_")));
+  assert.equal(est.rent_month, 1400);
+  assert.equal(est.rent_estimated, true);
+  assert.equal(est.rent_m2, null); // the official field stays null
+  assert.equal(est.share_of_lu_net, 1400 / 4000);
+  assert.equal(est.left_month, Math.round(4000 - 1400 - fuelCostMonth(25, 220, 6.5, 1.8)));
+  assert.equal(est.balance_month, est.left_month);
+  assert.ok(est.notes.includes("rent_estimate_canton_mean"));
+  assert.equal(none.rent_month, null);
+  assert.ok(none.notes.includes("rent_not_published"));
+  const [, estBuy] = computePlaces(estFixture, { size_m2: 70, tenure: "buy" });
+  assert.equal(estBuy.price_total, 350000);
+  assert.equal(estBuy.price_estimated, true);
+  assert.ok(estBuy.notes.includes("price_estimate_district_mean"));
+});
+
+test("estimates: useEstimates false behaves as before (null)", () => {
+  const [off, est] = computePlaces(estFixture, { size_m2: 70, tenure: "rent", useEstimates: false });
+  assert.equal(off.rent_month, 2100);
+  assert.equal(est.rent_month, null);
+  assert.equal(est.rent_estimated, false);
+  assert.equal(est.left_month, null);
+  assert.ok(est.notes.includes("rent_not_published"));
+  assert.equal(computePlaces(estFixture, { tenure: "buy", useEstimates: false })[1].price_total, null);
+});
+
+test("estimates: ranking includes estimated places and comparisons ignore them", () => {
+  const ps = computePlaces(estFixture, { size_m2: 70, tenure: "rent" });
+  assert.deepEqual(rank(ps, "housing").map((p) => p.name), ["Estimated", "Official", "Nothing"]);
+  const off = rank(computePlaces(estFixture, { size_m2: 70, tenure: "rent", useEstimates: false }), "housing");
+  assert.equal(off[0].name, "Official");
+  const withEst = { ...estFixture, places: [{ ...estFixture.places[0], lau: "0304", rent_m2: 50 }, estFixture.places[1]] };
+  assert.equal(comparisons(withEst, { hub: "kirchberg" }).length, 0);
+});
+
+test("real ouvivre.json: every Luxembourg place has a rent (official or estimated)", () => {
+  const data = JSON.parse(readFileSync(new URL("../data/ouvivre.json", import.meta.url), "utf8"));
+  const lu = computePlaces(data, { tenure: "rent" }).filter((p) => p.country === "LU");
+  assert.ok(lu.every((p) => p.rent_month !== null));
+  assert.ok(lu.some((p) => p.rent_estimated));
+});

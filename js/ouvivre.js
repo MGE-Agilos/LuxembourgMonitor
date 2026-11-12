@@ -29,7 +29,7 @@ export function referenceHourlyWage(data) {
 
 // timeValue (EUR per hour, default 0) prices the commute: time_cost_month = hours/month x timeValue, with the car hours
 // (mode "car") or the transit p50 hours (mode "transit"); balance_month = left_month - time_cost_month (null if either is).
-export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = "rent", timeValue = 0, mode = "car" } = {}) {
+export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = "rent", timeValue = 0, mode = "car", useEstimates = true } = {}) {
   const tv = num(timeValue) !== null && timeValue > 0 ? timeValue : 0;
   const net = num(data?.reference?.net_monthly_lu);
   const A = data?.assumptions || {};
@@ -41,9 +41,16 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
     const notes = [];
     const rentM2 = num(p.rent_m2);
     const saleM2 = num(p.sale_price_m2);
+    // Official figures always win; an estimate (labelled) only fills a masked one, and only when useEstimates is on.
+    const rentEst = useEstimates && rentM2 === null ? num(p.rent_m2_est) : null;
+    const saleEst = useEstimates && saleM2 === null ? num(p.sale_price_m2_est) : null;
+    const rent_estimated = rentEst !== null;
+    const price_estimated = saleEst !== null;
     // Only the figure of the chosen tenure is set, so sorting by housing never mixes rents and prices.
-    const rent_month = tenure !== "rent" || rentM2 === null ? null : Math.round(rentM2 * size_m2);
-    const price_total = tenure !== "buy" || saleM2 === null ? null : Math.round(saleM2 * size_m2);
+    const rentUsed = rentM2 ?? rentEst;
+    const saleUsed = saleM2 ?? saleEst;
+    const rent_month = tenure !== "rent" || rentUsed === null ? null : Math.round(rentUsed * size_m2);
+    const price_total = tenure !== "buy" || saleUsed === null ? null : Math.round(saleUsed * size_m2);
     const c = p.commute?.[hub] || null;
     const car_min = num(c?.driving);
     const car_km = num(c?.driving_km);
@@ -59,6 +66,8 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       else if (p.country === "FR") notes.push("no_sale_moselle");
       else notes.push("price_not_published");
     }
+    if (tenure === "rent" && rent_estimated) notes.push(`rent_estimate_${p.rent_est?.method || "unknown"}`);
+    if (tenure === "buy" && price_estimated) notes.push(`price_estimate_${p.sale_est?.method || "unknown"}`);
     if (p.country === "FR" && tenure === "rent" && rent_month !== null) notes.push("rent_charges_included", "rent_size_fr");
     if (p.country === "LU" && tenure === "rent" && rent_month !== null && size_m2 > 50) notes.push("rent_size_lu");
     if (!c) notes.push("commute_not_published");
@@ -95,8 +104,14 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       workers: num(p.lu_workers) ?? num(p.residents_employed),
       dist_lux_km: num(p.dist_lux_km),
       rent_m2: rentM2,
+      rent_m2_est: num(p.rent_m2_est),
+      rent_estimated,
+      rent_est: p.rent_est || null,
       rent_range: Array.isArray(p.rent_range) ? p.rent_range : null,
       sale_price_m2: saleM2,
+      sale_price_m2_est: num(p.sale_price_m2_est),
+      price_estimated,
+      sale_est: p.sale_est || null,
       house_price: num(p.house_price),
       house_price_median: num(p.house_price_median),
       appt_price_median: num(p.appt_price_median),
@@ -148,7 +163,8 @@ export function rank(places, by = "left") {
 // Striking comparisons for the kiosk attract mode, computed from the data (not hand-written).
 // Each place with a rent and a car time is compared with Luxembourg City for the same hub and size.
 export function comparisons(data, { hub = "kirchberg", size_m2 = 70, refLau = "0304", max = 6 } = {}) {
-  const places = computePlaces(data, { hub, size_m2, tenure: "rent" });
+  // Attract-mode claims rest on published figures only: no estimates here.
+  const places = computePlaces(data, { hub, size_m2, tenure: "rent", useEstimates: false });
   const ref = places.find((p) => p.lau === refLau);
   if (!ref || ref.rent_month === null || ref.hours_month_car === null) return [];
   return places
