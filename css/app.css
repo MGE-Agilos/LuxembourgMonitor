@@ -74,3 +74,6 @@ body.kiosk { font-size: 17px; user-select: none; -webkit-user-select: none; }
   .lm-tiles { grid-template-columns: 1fr 1fr; }
   .lm-tile .kpi-value { font-size: 24px; }
 }
+
+/* Long source names must wrap inside the answer card (phone width). */
+.lm-answer .chip { white-space: normal; max-width: 100%; }
