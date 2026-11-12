@@ -10,7 +10,7 @@ import { createMap } from "./map.js";
 import { comparisons } from "./ouvivre.js";
 import { ouvivreContext, ouvivreState, preselectOuvivre, renderOuvivre, resetOuvivre } from "./ouvivre-ui.js";
 import { renderCompare } from "./compare.js";
-import { problemsTeaser, renderCountry, renderPlace, renderSources } from "./pages.js";
+import { renderCountry, renderPlace, renderSources } from "./pages.js";
 
 const panel = document.getElementById("panel");
 const lead = document.getElementById("lead");
@@ -33,7 +33,7 @@ try {
 const map = createMap(luSvg, st.carte, { onSelect: (lau) => go(`#/c/${lau}`), communes: st.communes });
 let ovView = null;
 const grmap = createGrMap(grSvg, {
-  places: st.ouvivre.places, carte: st.carte, onSelect: (id) => ovView?.select(id),
+  places: st.ouvivre.places, carte: st.carte, onSelect: (id) => ovView?.select(id), onHover: (id) => ovView?.hover(id),
   getHub: () => ouvivreState().hub,
   onUserMode: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); } }, // a tap on km/minutes ends the attract loop
 });
@@ -166,11 +166,10 @@ function route() {
     grmap.clear();
     ovView = renderOuvivre({
       lead, panel, legend, data: st, grmap,
-      onCommune: (l) => go(`#/c/${l}`),
+      onCommune: (l) => go(`#/c/${l}`), go, onAsk: () => chat.open(),
       onChange: () => { if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); grmap.setMode("km"); } chat.refresh(); },
-      teaser: problemsTeaser,
     });
-    if (!VIDEO && KIOSK && !ouvivreState().hub) { grmap.resetAttract(); homeAttract.start(); }
+    if (!VIDEO && KIOSK && !ouvivreState().touched) { grmap.resetAttract(); homeAttract.start(); }
   }
   panel.scrollTop = 0;
   if (!wide.matches) window.scrollTo(0, 0);
@@ -211,7 +210,7 @@ if (KIOSK && !VIDEO) {
     const home = !location.hash || location.hash === "#/";
     if (Date.now() - last <= IDLE_MS) return;
     if (chat.isOpen() || chat.hasThread()) { chat.close({ restoreFocus: false }); chat.reset(); }
-    if (!home) { resetOuvivre(); go("#/"); } else if (ouvivreState().hub || !homeAttract.running()) { resetOuvivre(); route(); }
+    if (!home) { resetOuvivre(); go("#/"); } else if (ouvivreState().touched || !homeAttract.running()) { resetOuvivre(); route(); }
   }, 5000);
 }
 

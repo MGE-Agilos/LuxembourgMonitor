@@ -234,12 +234,11 @@ export function problemsTeaser() {
   return box;
 }
 
-export function renderCountry(el, { onAsk }) {
+// The big national figures (population, endowment fund, debt, sale price, rent) as tiles.
+function bigTiles(cls = "") {
   const lang = getLang();
-  const st = data(), n = st.national || {};
-  const hero = h("div", "lm-hero");
-  hero.append(h("p", "eyebrow", t("eyebrow")), h("h1", null, t("pr.big")), h("p", "lead", t("pr.lead")));
-  const tiles = h("div", "lm-tiles pr-big");
+  const n = data().national || {};
+  const tiles = h("div", `lm-tiles pr-big ${cls}`.trim());
   if (n.population) tiles.append(figTile(num(n.population.v), t("pr.big.pop", { y: n.population.y }),
     n.population.growth_10y == null ? null : t("pr.big.growth", { g: signed(pctUnit(n.population.growth_10y, 1, lang), n.population.growth_10y) }), [metaSrc("statec_pop", n.population.y)]));
   if (n.fdgc_total) tiles.append(figTile(eurBig(n.fdgc_total.v), t("pr.big.fdgc", { y: n.fdgc_total.y }), null, [metaSrc("qp3720_fdgc", n.fdgc_total.y)]));
@@ -247,6 +246,22 @@ export function renderCountry(el, { onAsk }) {
     n.debt_pc ? t("pr.big.debt_pc", { v: eur(n.debt_pc.v) }) : null, [metaSrc("qp3719_debt", n.debt.y)]));
   if (n.sale_price_m2) tiles.append(figTile(`${num(n.sale_price_m2.v)} €/m²`, t("pr.big.sale", { y: n.sale_price_m2.y }), null, [metaSrc("habitat_sales", n.sale_price_m2.y)]));
   if (n.rent_appt) tiles.append(figTile(eur(n.rent_appt.v), t("pr.big.rent", { y: n.rent_appt.y }), null, [metaSrc("habitat_rents", n.rent_appt.y)]));
+  return tiles;
+}
+
+// Home "Luxembourg in figures" tab: big numbers + the 5 everyday problems, compact, with a link to the full page.
+export function countryCompact() {
+  const box = h("section", "pr-compact");
+  const pr = problems({ compact: true });
+  box.append(bigTiles("is-compact"), h("p", "section-title", t("pr.title")), pr.el, link(t("pr.more"), "#/pays", "btn small pr-morebtn"));
+  return box;
+}
+
+export function renderCountry(el, { onAsk }) {
+  const st = data(), n = st.national || {};
+  const hero = h("div", "lm-hero");
+  hero.append(h("p", "eyebrow", t("eyebrow")), h("h1", null, t("pr.big")), h("p", "lead", t("pr.lead")));
+  const tiles = bigTiles();
 
   const prTitle = h("h2", "pr-h2", t("pr.title"));
   const pr = problems();

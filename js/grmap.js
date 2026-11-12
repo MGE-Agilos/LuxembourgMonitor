@@ -36,7 +36,7 @@ export function placeName(p, lang = getLang()) {
   return p.lau ? displayName(p, lang) : p.name;
 }
 
-export function createGrMap(svg, { places, carte, onSelect, getHub = () => null, onUserMode = () => {} }) {
+export function createGrMap(svg, { places, carte, onSelect, onHover = () => {}, getHub = () => null, onUserMode = () => {} }) {
   const W = 600, H = 780;
   const sel = d3.select(svg).attr("viewBox", `0 0 ${W} ${H}`).attr("preserveAspectRatio", "xMidYMid meet");
   const pts = places.map((p) => [p.lon, p.lat]);
@@ -68,7 +68,9 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
     .attr("class", "gr-lu")
     .attr("d", (d) => ringsPath(d.lens, d.cur))
     .attr("data-id", (d) => `lu:${d.lau}`)
-    .on("click", (_e, d) => onSelect(`lu:${d.lau}`));
+    .on("click", (_e, d) => onSelect(`lu:${d.lau}`))
+    .on("mouseenter", (_e, d) => onHover(`lu:${d.lau}`))
+    .on("mouseleave", () => onHover(null));
   const luTitles = lu.append("title");
 
   const cross = places.filter((p) => p.country !== "LU" && Number.isFinite(p.lat) && Number.isFinite(p.lon));
@@ -78,7 +80,9 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
     .attr("class", "gr-place")
     .attr("data-id", (p) => p.id)
     .attr("transform", (p) => `translate(${proj([p.lon, p.lat])})`)
-    .on("click", (_e, p) => onSelect(p.id));
+    .on("click", (_e, p) => onSelect(p.id))
+    .on("mouseenter", (_e, p) => onHover(p.id))
+    .on("mouseleave", () => onHover(null));
   groups.append("circle").attr("class", "gr-hit").attr("r", (p) => Math.max(16, r(p.lu_workers) + 6));
   groups.append("circle").attr("class", "gr-pt").attr("r", (p) => Math.max(4, r(p.lu_workers)));
   const ptTitles = groups.append("title");
@@ -169,12 +173,13 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
 
   const all = new Map(places.map((p) => [p.id, p]));
   let names = [];
+  let hov = null; // place hovered in the ranking table (or on the map): outlined and named
   function drawNames() {
     const lang = getLang();
     // Greedy placement: above the mark, else right, else left; a label that still collides is dropped.
     const boxes = [];
     const items = [];
-    for (const p of names.map((id) => all.get(id)).filter(Boolean)) {
+    for (const p of [...new Set(hov ? [hov, ...names] : names)].map((id) => all.get(id)).filter(Boolean)) {
       const text = placeName(p, lang);
       const [x, y] = posOf(p);
       const rad = p.country === "LU" ? 0 : Math.max(4, r(p.lu_workers || 0));
@@ -341,6 +346,15 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
     groups.attr("data-sel", (p) => (p.id === id ? "" : null));
     if (id) groups.filter((p) => p.id === id).raise();
   }
+  // Hover from the ranking table: outline the place and name it (no redraw of the statuses).
+  function hover(id) {
+    if (id === hov) return;
+    hov = id;
+    lu.attr("data-hov", (d) => (`lu:${d.lau}` === id ? "" : null));
+    groups.attr("data-hov", (p) => (p.id === id ? "" : null));
+    if (id) groups.filter((p) => p.id === id).raise();
+    drawNames();
+  }
   // Attract mode: light up a few places (ids), fade the rest.
   function highlight(groupsArg = {}) {
     const ids = new Set(groupsArg.focus || []);
@@ -379,7 +393,7 @@ export function createGrMap(svg, { places, carte, onSelect, getHub = () => null,
   loadCountries();
   relabel();
   return {
-    update, select, highlight, highlightPlaces, clear: () => highlight({}), relabel, setMode, attractStep,
+    update, select, hover, highlight, highlightPlaces, clear: () => highlight({}), relabel, setMode, attractStep,
     mode: () => mode, resetAttract: () => { attractI = 0; },
   };
 }

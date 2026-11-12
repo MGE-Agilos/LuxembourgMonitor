@@ -11,6 +11,7 @@ import { btn, eur, num, srcToggle } from "./ui.js";
 
 export const MAX = 3;
 let hub = null;
+const currentHub = () => hub;
 
 export function resolvePlace(id) {
   const st = data();
@@ -95,7 +96,7 @@ function table(cols, rows, lang) {
   return wrap;
 }
 
-function dailyRows(places, lang) {
+function dailyRows(places, lang, hub = currentHub()) {
   const st = data(), ov = st.ouvivre;
   const size = ouvivreState().size || 70;
   const calc = (tenure) => {
@@ -151,6 +152,33 @@ function themeRows(places, theme, lang) {
       }),
     };
   });
+}
+
+// Compact comparator for the home "Compare" tab: daily-life rows only, for the visitor's hub and size.
+// ids: ouvivre place ids or LAU codes; onRemove(id) is called with the id as given.
+export function compareTable(ids, { hub: hb, onRemove }) {
+  const lang = getLang();
+  const box = h("div", "cmp-inline");
+  const places = [];
+  const given = [];
+  for (const id of ids) {
+    const r = resolvePlace(id);
+    if (r && !places.some((x) => x.id === r.id)) { places.push(r); given.push(id); }
+  }
+  if (!places.length) return box;
+  const heads = h("div", "cmp-heads cmp-heads-inline");
+  places.forEach((r, i) => {
+    const card = h("div", "card cmp-head");
+    const top = h("div", "cmp-headtop");
+    top.append(h("span", "cmp-name", nameOf(r, lang)), h("span", "chip", r.country));
+    const x = btn("cmp-x", "×", () => onRemove(given[i]));
+    x.setAttribute("aria-label", t("cmp.remove", { name: nameOf(r, lang) }));
+    top.append(x);
+    card.append(top);
+    heads.append(card);
+  });
+  box.append(heads, table(places, dailyRows(places, lang, hb), lang));
+  return box;
 }
 
 export function renderCompare(el, ids, { go }) {
