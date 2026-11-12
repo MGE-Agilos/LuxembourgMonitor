@@ -1,695 +1,1260 @@
 {
  "en": {
   "q1": {
-   "text": "Kirchberg is part of Luxembourg City, so I looked at communes within 15 km of the city with many children. Sandweiler is the closest at 6.4 km, with 23.4% of residents under 20 and apartments asking 8,793 €/m². Kehlen is a bit farther at 9.6 km, with 24.1% under 20 and 8,157 €/m². Garnich has the highest share of under-20s (24.8%) and 8,078 €/m², but it is 13.6 km away. The trade-off is that the closer you are, the higher the asking prices tend to be. These are statistics, not advice.",
+   "text": "For a 70 m² flat, advertised rent is 1,134 € in Thionville versus 3,514 € in Luxembourg City, leaving about 3,353 € versus 1,125 € after rent and fuel from the average net salary. The trade-off is time: 39 minutes by car to Kirchberg from Thionville (85 by public transport) against 12 minutes by car (24 by public transport) from the city. Caveats: these are advertised rents, not rents paid, and modelled commute times underestimate border queues.",
    "communes": [
-    "0306",
-    "0105",
-    "0102"
+    "0304"
+   ],
+   "places": [
+    "fr:insee:57672"
    ],
    "figures": [
     {
-     "commune": "0306",
-     "indicator": "dist_lux_km",
-     "value": 6.4,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "rent_month@70",
+     "label": {
+      "en": "Advertised rent for 70 m² per month",
+      "fr": "Loyer annoncé pour 70 m² par mois"
+     },
+     "value": 1134,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "anil_loyers_2025"
+     ]
     },
     {
-     "commune": "0306",
-     "indicator": "under20_share",
-     "value": 23.4,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "rent_month@70",
+     "label": {
+      "en": "Advertised rent for 70 m² per month",
+      "fr": "Loyer annoncé pour 70 m² par mois"
+     },
+     "value": 3514,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0304",
+     "sources": [
+      "habitat_rents"
+     ]
     },
     {
-     "commune": "0306",
-     "indicator": "appt_price_m2",
-     "value": 8793,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "left_month@kirchberg@70",
+     "label": {
+      "en": "Left to live per month after rent (70 m²) and fuel to Kirchberg",
+      "fr": "Reste à vivre par mois après loyer (70 m²) et carburant vers Kirchberg"
+     },
+     "value": 3353,
+     "unit": "€/month",
+     "year": "2026-10",
+     "sources": [
+      "anil_loyers_2025",
+      "chathome",
+      "lu_fuel",
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0105",
-     "indicator": "dist_lux_km",
-     "value": 9.6,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "left_month@kirchberg@70",
+     "label": {
+      "en": "Left to live per month after rent (70 m²) and fuel to Kirchberg",
+      "fr": "Reste à vivre par mois après loyer (70 m²) et carburant vers Kirchberg"
+     },
+     "value": 1125,
+     "unit": "€/month",
+     "year": "2026-10",
+     "commune": "0304",
+     "sources": [
+      "habitat_rents",
+      "chathome",
+      "lu_fuel",
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0105",
-     "indicator": "under20_share",
-     "value": 24.1,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "car_min@kirchberg",
+     "label": {
+      "en": "Minutes by car to Kirchberg (weekday morning)",
+      "fr": "Minutes en voiture vers Kirchberg (matin de semaine)"
+     },
+     "value": 39,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0105",
-     "indicator": "appt_price_m2",
-     "value": 8157,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "transit_min@kirchberg",
+     "label": {
+      "en": "Minutes by public transport to Kirchberg (typical)",
+      "fr": "Minutes en transports en commun vers Kirchberg (habituel)"
+     },
+     "value": 85,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0102",
-     "indicator": "under20_share",
-     "value": 24.8,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "car_min@kirchberg",
+     "label": {
+      "en": "Minutes by car to Kirchberg (weekday morning)",
+      "fr": "Minutes en voiture vers Kirchberg (matin de semaine)"
+     },
+     "value": 12,
+     "unit": "min",
+     "year": null,
+     "commune": "0304",
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0102",
-     "indicator": "appt_price_m2",
-     "value": 8078,
-     "year": 2026
-    },
-    {
-     "commune": "0102",
-     "indicator": "dist_lux_km",
-     "value": 13.6,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "transit_min@kirchberg",
+     "label": {
+      "en": "Minutes by public transport to Kirchberg (typical)",
+      "fr": "Minutes en transports en commun vers Kirchberg (habituel)"
+     },
+     "value": 24,
+     "unit": "min",
+     "year": null,
+     "commune": "0304",
+     "sources": [
+      "chathome"
+     ]
     }
    ],
    "sources": [
-    "act",
-    "rnpp",
-    "habitat"
+    "anil_loyers_2025",
+    "habitat_rents",
+    "chathome",
+    "lu_fuel",
+    "eurostat_earn_nt_net"
    ],
-   "followup": "Which of these communes has the lowest unemployment rate?"
+   "source_details": [
+    {
+     "id": "anil_loyers_2025",
+     "name": "ANIL / DGALN - Carte des loyers 2025 (appartements, charges comprises, annonces)",
+     "url": "https://www.data.gouv.fr/datasets/carte-des-loyers-indicateurs-de-loyers-dannonce-par-commune-en-2025"
+    },
+    {
+     "id": "habitat_rents",
+     "name": "Observatoire de l'Habitat - Advertised rents by municipality",
+     "url": "https://data.public.lu/fr/datasets/loyers-annonces-des-logements-par-commune/"
+    },
+    {
+     "id": "chathome",
+     "name": "ChatHome - temps de trajet vers les pôles d'emploi (modèle tiers, matin de semaine)",
+     "url": "https://data.public.lu/en/datasets/temps-de-trajet-vers-les-poles-demploi-du-luxembourg-chathome/"
+    },
+    {
+     "id": "lu_fuel",
+     "name": "Ministère de l'Économie (DG Énergie) / STATEC - prix moyens mensuels des carburants (TVAC)",
+     "url": "https://data.public.lu/fr/datasets/comparaison-des-prix-de-carburants-par-motorisation/"
+    },
+    {
+     "id": "eurostat_earn_nt_net",
+     "name": "Eurostat - Net earnings, single person without children (earn_nt_net)",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/earn_nt_net/default/table"
+    }
+   ],
+   "followup": "How do Metz or Arlon compare for a Kirchberg commute?"
   },
   "q2": {
-   "text": "Over the last 10 years, Weiswampach grew fastest, with population up 61%. Next come Saeul (49.5%), Contern (42.6%), Boulaide (40.7%) and Bous-Waldbredimus (37.6%). Several of these are small communes, so a modest number of new residents can produce a large percentage.",
+   "text": "For a 90 m² family flat within 30 minutes' drive of Belval, the lowest advertised rents are just across the French border: Mont-Saint-Martin at 1251 €/month and Villerupt at 1278 € (19 minutes by car). In Luxembourg, Frisange (2277 €) and Kayl (2313 €) are the cheapest in this range. The trade-off is rent versus commute time. Caveats: rents are advertised, not paid, and modelled commute times underestimate border queues.",
    "communes": [
-    "0505",
-    "0707",
-    "0302",
-    "0801",
-    "1209"
+    "0205",
+    "0206"
+   ],
+   "places": [
+    "fr:insee:54382",
+    "fr:insee:54580"
    ],
    "figures": [
     {
-     "commune": "0505",
-     "indicator": "pop_growth_10y",
-     "value": 61,
-     "year": 2026
+     "place": "fr:insee:54382",
+     "name": "Mont-Saint-Martin",
+     "country": "FR",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 1251,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "anil_loyers_2025"
+     ]
     },
     {
-     "commune": "0707",
-     "indicator": "pop_growth_10y",
-     "value": 49.5,
-     "year": 2026
+     "place": "fr:insee:54580",
+     "name": "Villerupt",
+     "country": "FR",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 1278,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "anil_loyers_2025"
+     ]
     },
     {
-     "commune": "0302",
-     "indicator": "pop_growth_10y",
-     "value": 42.6,
-     "year": 2026
+     "place": "fr:insee:54580",
+     "name": "Villerupt",
+     "country": "FR",
+     "indicator": "car_min@belval",
+     "label": {
+      "en": "Minutes by car to Belval (weekday morning)",
+      "fr": "Minutes en voiture vers Belval (matin de semaine)"
+     },
+     "value": 19,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0801",
-     "indicator": "pop_growth_10y",
-     "value": 40.7,
-     "year": 2026
+     "place": "0205",
+     "name": "Frisange",
+     "country": "LU",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 2277,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0205",
+     "sources": [
+      "habitat_rents"
+     ]
     },
     {
-     "commune": "1209",
-     "indicator": "pop_growth_10y",
-     "value": 37.6,
-     "year": 2026
+     "place": "0206",
+     "name": "Kayl",
+     "country": "LU",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 2313,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0206",
+     "sources": [
+      "habitat_rents"
+     ]
     }
    ],
    "sources": [
-    "statec_pop"
+    "anil_loyers_2025",
+    "chathome",
+    "habitat_rents"
    ],
-   "followup": "Which of these communes are close to Luxembourg City?"
+   "source_details": [
+    {
+     "id": "anil_loyers_2025",
+     "name": "ANIL / DGALN - Carte des loyers 2025 (appartements, charges comprises, annonces)",
+     "url": "https://www.data.gouv.fr/datasets/carte-des-loyers-indicateurs-de-loyers-dannonce-par-commune-en-2025"
+    },
+    {
+     "id": "chathome",
+     "name": "ChatHome - temps de trajet vers les pôles d'emploi (modèle tiers, matin de semaine)",
+     "url": "https://data.public.lu/en/datasets/temps-de-trajet-vers-les-poles-demploi-du-luxembourg-chathome/"
+    },
+    {
+     "id": "habitat_rents",
+     "name": "Observatoire de l'Habitat - Advertised rents by municipality",
+     "url": "https://data.public.lu/fr/datasets/loyers-annonces-des-logements-par-commune/"
+    }
+   ],
+   "followup": "How do Villerupt and Kayl compare on public transport time to Belval?"
   },
   "q3": {
-   "text": "The lowest asking prices for apartments per m² are in Esch-sur-Sûre at 5,681 €/m², then Clervaux at 5,809 €/m² and Wiltz at 5,894 €/m². Goesdorf (6,096 €/m²) and Rumelange (6,466 €/m²) follow. These are average asking prices from listings, July 2025 to June 2026. Only 61 communes have a figure, because the others had fewer than 30 listings.",
-   "communes": [
-    "0802",
-    "0501",
-    "0807",
-    "0804",
-    "0212"
-   ],
+   "text": "In 2025, the Luxembourg–Trier line had a punctuality of 87.4%. That is below the 89.6% for the whole CFL network and below the 92% CFL target. These are yearly averages, so they don't show how individual trains or rush hours behave.",
+   "communes": [],
+   "places": [],
    "figures": [
     {
-     "commune": "0802",
-     "indicator": "appt_price_m2",
-     "value": 5681,
-     "year": 2026
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "cfl_lux_trier_punctuality",
+     "label": {
+      "fr": "Ponctualité Luxembourg-Trèves",
+      "en": "Punctuality Luxembourg-Trier"
+     },
+     "value": 87.4,
+     "unit": "%",
+     "year": "2025",
+     "sources": [
+      "rel:https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025"
+     ]
     },
     {
-     "commune": "0501",
-     "indicator": "appt_price_m2",
-     "value": 5809,
-     "year": 2026
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "cfl_punctuality",
+     "label": {
+      "fr": "Ponctualité des trains CFL (ensemble du réseau)",
+      "en": "CFL train punctuality (whole network)"
+     },
+     "value": 89.6,
+     "unit": "%",
+     "year": "2025",
+     "sources": [
+      "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
+     ]
     },
     {
-     "commune": "0807",
-     "indicator": "appt_price_m2",
-     "value": 5894,
-     "year": 2026
-    },
-    {
-     "commune": "0804",
-     "indicator": "appt_price_m2",
-     "value": 6096,
-     "year": 2026
-    },
-    {
-     "commune": "0212",
-     "indicator": "appt_price_m2",
-     "value": 6466,
-     "year": 2026
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "cfl_punctuality_target",
+     "label": {
+      "fr": "Objectif de ponctualité CFL",
+      "en": "CFL punctuality target"
+     },
+     "value": 92,
+     "unit": "%",
+     "year": "2025",
+     "sources": [
+      "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
+     ]
     }
    ],
    "sources": [
-    "habitat"
+    "rel:https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025",
+    "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
    ],
-   "followup": "Which of these communes are closest to Luxembourg City?"
+   "source_details": [
+    {
+     "id": "rel:https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025",
+     "name": "paperjam.lu",
+     "url": "https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025"
+    },
+    {
+     "id": "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/",
+     "name": "lesfrontaliers.lu",
+     "url": "https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
+    }
+   ],
+   "followup": "How does Trier compare with Thionville for commuting to Luxembourg station?"
   },
   "q4": {
-   "text": "Esch-sur-Alzette is the larger and denser of the two: 38,275 residents and 2,667 per km², against 31,421 and 1,417 per km² in Differdange. Differdange has grown faster over 10 years (26.7% versus 12.8%) and has a younger profile, with 23.7% under 20 compared with 21.4%. Its unemployment rate is lower, at 9.1% versus 10.8%. Apartment asking prices are similar, about 7,325 €/m² in Esch and 7,198 €/m² in Differdange. Esch is a bit closer to Luxembourg City, at 17.1 km versus 20.4 km.",
+   "text": "As of 1 February 2026, the highest municipal debt per resident is in Echternach at €12,363. Mertzig follows with €11,537, then Mamer with €10,762, Bettembourg with €10,617 and Préizerdaul with €10,368. These are statistics only. The data does not show the reasons behind these levels.",
    "communes": [
-    "0204",
-    "0202"
+    "1005",
+    "0607",
+    "0108",
+    "0201",
+    "0702"
    ],
+   "places": [],
    "figures": [
     {
-     "commune": "0204",
-     "indicator": "pop",
-     "value": 38275,
+     "commune": "1005",
+     "indicator": "debt_pc",
+     "value": 12363,
      "year": 2026
     },
     {
-     "commune": "0202",
-     "indicator": "pop",
-     "value": 31421,
+     "commune": "0607",
+     "indicator": "debt_pc",
+     "value": 11537,
      "year": 2026
     },
     {
-     "commune": "0204",
-     "indicator": "density",
-     "value": 2667,
+     "commune": "0108",
+     "indicator": "debt_pc",
+     "value": 10762,
      "year": 2026
     },
     {
-     "commune": "0202",
-     "indicator": "density",
-     "value": 1417,
+     "commune": "0201",
+     "indicator": "debt_pc",
+     "value": 10617,
      "year": 2026
     },
     {
-     "commune": "0204",
-     "indicator": "pop_growth_10y",
-     "value": 12.8,
-     "year": 2026
-    },
-    {
-     "commune": "0202",
-     "indicator": "pop_growth_10y",
-     "value": 26.7,
-     "year": 2026
-    },
-    {
-     "commune": "0204",
-     "indicator": "under20_share",
-     "value": 21.4,
-     "year": 2026
-    },
-    {
-     "commune": "0202",
-     "indicator": "under20_share",
-     "value": 23.7,
-     "year": 2026
-    },
-    {
-     "commune": "0204",
-     "indicator": "unemployment_rate",
-     "value": 10.8,
-     "year": 2025
-    },
-    {
-     "commune": "0202",
-     "indicator": "unemployment_rate",
-     "value": 9.1,
-     "year": 2025
-    },
-    {
-     "commune": "0204",
-     "indicator": "appt_price_m2",
-     "value": 7325,
-     "year": 2026
-    },
-    {
-     "commune": "0202",
-     "indicator": "appt_price_m2",
-     "value": 7198,
+     "commune": "0702",
+     "indicator": "debt_pc",
+     "value": 10368,
      "year": 2026
     }
    ],
    "sources": [
-    "statec_pop",
-    "statec_density",
-    "rnpp",
-    "statec_labour",
-    "habitat",
-    "act"
+    "qp3719_debt"
    ],
-   "followup": "How do they compare with Luxembourg City on prices?"
+   "source_details": [
+    {
+     "id": "qp3719_debt",
+     "name": "Answer of the Minister of Home Affairs to parliamentary question no. 3719 (20.03.2026), annex: municipal debt at 01.02.2026 and loans in 2026 budgets",
+     "url": "https://wdocs-pub.chd.lu/docs/exped/2026/03/QP_62672_1774017035048.pdf"
+    }
+   ],
+   "followup": "How does debt per resident compare with FDGC funding per inhabitant in these communes?"
   },
   "q5": {
-   "text": "Looking at the share of residents aged 65 and over, Mondorf-les-Bains comes first with 25.8%. It is followed by Niederanven (23.1%), Remich (22.7%), Mondercange (21.3%) and Diekirch (20.7%). These are statistics about communes, not a judgement on them.",
+   "text": "Waldbillig has the smallest fundamental-school classes, with 12.1 pupils per class (2024). Next come Leudelange at 13.4, then Esch-sur-Alzette, Koerich and Troisvierges at 13.5 each. These are averages per commune, so individual schools may differ.",
    "communes": [
-    "1204",
-    "0305",
-    "1205",
-    "0208",
-    "0603"
+    "1008",
+    "0207",
+    "0204",
+    "0106",
+    "0504"
    ],
+   "places": [],
    "figures": [
     {
-     "commune": "1204",
-     "indicator": "over65_share",
-     "value": 25.8,
-     "year": 2026
+     "commune": "1008",
+     "indicator": "pupils_per_class",
+     "value": 12.1,
+     "year": 2024
     },
     {
-     "commune": "0305",
-     "indicator": "over65_share",
-     "value": 23.1,
-     "year": 2026
+     "commune": "0207",
+     "indicator": "pupils_per_class",
+     "value": 13.4,
+     "year": 2024
     },
     {
-     "commune": "1205",
-     "indicator": "over65_share",
-     "value": 22.7,
-     "year": 2026
+     "commune": "0204",
+     "indicator": "pupils_per_class",
+     "value": 13.5,
+     "year": 2024
     },
     {
-     "commune": "0208",
-     "indicator": "over65_share",
-     "value": 21.3,
-     "year": 2026
+     "commune": "0106",
+     "indicator": "pupils_per_class",
+     "value": 13.5,
+     "year": 2024
     },
     {
-     "commune": "0603",
-     "indicator": "over65_share",
-     "value": 20.7,
-     "year": 2026
+     "commune": "0504",
+     "indicator": "pupils_per_class",
+     "value": 13.5,
+     "year": 2024
     }
    ],
    "sources": [
-    "rnpp"
+    "statec_schools"
    ],
-   "followup": "Which communes have the youngest population?"
+   "source_details": [
+    {
+     "id": "statec_schools",
+     "name": "STATEC / MENJE - Fundamental schools by municipality (DF_X046)",
+     "url": "https://lustat.statec.lu/vis?df[ds]=ds-release&df[ag]=LU1&df[id]=DF_X046"
+    }
+   ],
+   "followup": "Which communes have the largest classes?"
   },
   "q6": {
-   "text": "Three communes tie for the lowest unemployment rate in 2025: Heffingen, Nommern and Weiler-la-Tour, each at 2.5%. Next come Saeul and Schieren, both at 2.9%. These are statistics for each commune, and small communes can see their rates move quickly.",
-   "communes": [
-    "0405",
-    "0410",
-    "0311",
-    "0707",
-    "0609"
-   ],
+   "text": "No open source publishes what cross-border workers themselves earn, so I can only compare countries, not people. Average net monthly earnings for a single person are €4,656 in Luxembourg, versus €2,696 in France, €3,045 in Germany and €3,035 in Belgium. Statutory minimum wages follow the same pattern: €2,771 in Luxembourg and €1,867 in France.",
+   "communes": [],
+   "places": [],
    "figures": [
     {
-     "commune": "0405",
-     "indicator": "unemployment_rate",
-     "value": 2.5,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_lu",
+     "label": {
+      "en": "Average net monthly earnings, LU (single, no children)",
+      "fr": "Salaire net mensuel moyen, LU (célibataire sans enfant)"
+     },
+     "value": 4656,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0410",
-     "indicator": "unemployment_rate",
-     "value": 2.5,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_fr",
+     "label": {
+      "en": "Average net monthly earnings, FR (single, no children)",
+      "fr": "Salaire net mensuel moyen, FR (célibataire sans enfant)"
+     },
+     "value": 2696,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0311",
-     "indicator": "unemployment_rate",
-     "value": 2.5,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_de",
+     "label": {
+      "en": "Average net monthly earnings, DE (single, no children)",
+      "fr": "Salaire net mensuel moyen, DE (célibataire sans enfant)"
+     },
+     "value": 3045,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0707",
-     "indicator": "unemployment_rate",
-     "value": 2.9,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_be",
+     "label": {
+      "en": "Average net monthly earnings, BE (single, no children)",
+      "fr": "Salaire net mensuel moyen, BE (célibataire sans enfant)"
+     },
+     "value": 3035,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0609",
-     "indicator": "unemployment_rate",
-     "value": 2.9,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "min_wage_lu",
+     "label": {
+      "en": "Monthly minimum wage, LU",
+      "fr": "Salaire minimum mensuel, LU"
+     },
+     "value": 2771,
+     "unit": "€/month",
+     "year": "2026-S2",
+     "sources": [
+      "eurostat_earn_mw_cur"
+     ]
+    },
+    {
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "min_wage_fr",
+     "label": {
+      "en": "Monthly minimum wage, FR",
+      "fr": "Salaire minimum mensuel, FR"
+     },
+     "value": 1867,
+     "unit": "€/month",
+     "year": "2026-S2",
+     "sources": [
+      "eurostat_earn_mw_cur"
+     ]
     }
    ],
    "sources": [
-    "statec_labour"
+    "eurostat_earn_nt_net",
+    "eurostat_earn_mw_cur"
    ],
-   "followup": "How do house prices compare in these communes?"
+   "source_details": [
+    {
+     "id": "eurostat_earn_nt_net",
+     "name": "Eurostat - Net earnings, single person without children (earn_nt_net)",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/earn_nt_net/default/table"
+    },
+    {
+     "id": "eurostat_earn_mw_cur",
+     "name": "Eurostat - Monthly minimum wages (earn_mw_cur)",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table"
+    }
+   ],
+   "followup": "How much is left to live in Thionville versus Luxembourg City for a Kirchberg job?"
   }
  },
  "fr": {
   "q1": {
-   "text": "Le Kirchberg fait partie de la commune de Luxembourg-Ville ; pour une jeune famille, voici quelques communes proches à regarder. Sandweiler est la plus proche (6,4 km) avec 23,4 % de moins de 20 ans, mais ses appartements sont à 8 793 €/m². Weiler-la-Tour (9,1 km) est plus abordable, à 6 965 €/m², avec 22,4 % de moins de 20 ans. Kehlen compte la plus forte part de jeunes (24,1 %) pour 8 157 €/m², à 9,6 km. Le compromis : plus on se rapproche du Kirchberg, plus les prix demandés sont élevés. Ce sont des statistiques, pas un conseil.",
+   "text": "Pour un couple (70 m²), le loyer annoncé est de 1134 € à Thionville contre 3514 € à Luxembourg-Ville. Il reste ainsi 3353 € à Thionville contre 1125 € en ville, avant autres dépenses. En contrepartie, le trajet vers le Kirchberg dure 39 min en voiture à Thionville (85 min en transports) contre 12 min en ville. Attention : les temps sont modélisés et sous-estiment les bouchons frontaliers, et le carburant seul est compté.",
    "communes": [
-    "0306",
-    "0311",
-    "0105",
-    "0307"
+    "0304"
+   ],
+   "places": [
+    "fr:insee:57672"
    ],
    "figures": [
     {
-     "commune": "0306",
-     "indicator": "dist_lux_km",
-     "value": 6.4,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "rent_month@70",
+     "label": {
+      "en": "Advertised rent for 70 m² per month",
+      "fr": "Loyer annoncé pour 70 m² par mois"
+     },
+     "value": 1134,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "anil_loyers_2025"
+     ]
     },
     {
-     "commune": "0306",
-     "indicator": "under20_share",
-     "value": 23.4,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "rent_month@70",
+     "label": {
+      "en": "Advertised rent for 70 m² per month",
+      "fr": "Loyer annoncé pour 70 m² par mois"
+     },
+     "value": 3514,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0304",
+     "sources": [
+      "habitat_rents"
+     ]
     },
     {
-     "commune": "0306",
-     "indicator": "appt_price_m2",
-     "value": 8793,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "left_month@kirchberg@70",
+     "label": {
+      "en": "Left to live per month after rent (70 m²) and fuel to Kirchberg",
+      "fr": "Reste à vivre par mois après loyer (70 m²) et carburant vers Kirchberg"
+     },
+     "value": 3353,
+     "unit": "€/month",
+     "year": "2026-10",
+     "sources": [
+      "anil_loyers_2025",
+      "chathome",
+      "lu_fuel",
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0311",
-     "indicator": "dist_lux_km",
-     "value": 9.1,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "left_month@kirchberg@70",
+     "label": {
+      "en": "Left to live per month after rent (70 m²) and fuel to Kirchberg",
+      "fr": "Reste à vivre par mois après loyer (70 m²) et carburant vers Kirchberg"
+     },
+     "value": 1125,
+     "unit": "€/month",
+     "year": "2026-10",
+     "commune": "0304",
+     "sources": [
+      "habitat_rents",
+      "chathome",
+      "lu_fuel",
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0311",
-     "indicator": "under20_share",
-     "value": 22.4,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "car_min@kirchberg",
+     "label": {
+      "en": "Minutes by car to Kirchberg (weekday morning)",
+      "fr": "Minutes en voiture vers Kirchberg (matin de semaine)"
+     },
+     "value": 39,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0311",
-     "indicator": "appt_price_m2",
-     "value": 6965,
-     "year": 2026
+     "place": "fr:insee:57672",
+     "name": "Thionville",
+     "country": "FR",
+     "indicator": "transit_min@kirchberg",
+     "label": {
+      "en": "Minutes by public transport to Kirchberg (typical)",
+      "fr": "Minutes en transports en commun vers Kirchberg (habituel)"
+     },
+     "value": 85,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0105",
-     "indicator": "under20_share",
-     "value": 24.1,
-     "year": 2026
-    },
-    {
-     "commune": "0105",
-     "indicator": "appt_price_m2",
-     "value": 8157,
-     "year": 2026
-    },
-    {
-     "commune": "0105",
-     "indicator": "dist_lux_km",
-     "value": 9.6,
-     "year": 2026
+     "place": "0304",
+     "name": "Luxembourg City",
+     "country": "LU",
+     "indicator": "car_min@kirchberg",
+     "label": {
+      "en": "Minutes by car to Kirchberg (weekday morning)",
+      "fr": "Minutes en voiture vers Kirchberg (matin de semaine)"
+     },
+     "value": 12,
+     "unit": "min",
+     "year": null,
+     "commune": "0304",
+     "sources": [
+      "chathome"
+     ]
     }
    ],
    "sources": [
-    "act",
-    "rnpp",
-    "habitat"
+    "anil_loyers_2025",
+    "habitat_rents",
+    "chathome",
+    "lu_fuel",
+    "eurostat_earn_nt_net"
    ],
-   "followup": "Quelles communes proches ont le chômage le plus bas ?"
+   "source_details": [
+    {
+     "id": "anil_loyers_2025",
+     "name": "ANIL / DGALN - Carte des loyers 2025 (appartements, charges comprises, annonces)",
+     "url": "https://www.data.gouv.fr/datasets/carte-des-loyers-indicateurs-de-loyers-dannonce-par-commune-en-2025"
+    },
+    {
+     "id": "habitat_rents",
+     "name": "Observatoire de l'Habitat - Advertised rents by municipality",
+     "url": "https://data.public.lu/fr/datasets/loyers-annonces-des-logements-par-commune/"
+    },
+    {
+     "id": "chathome",
+     "name": "ChatHome - temps de trajet vers les pôles d'emploi (modèle tiers, matin de semaine)",
+     "url": "https://data.public.lu/en/datasets/temps-de-trajet-vers-les-poles-demploi-du-luxembourg-chathome/"
+    },
+    {
+     "id": "lu_fuel",
+     "name": "Ministère de l'Économie (DG Énergie) / STATEC - prix moyens mensuels des carburants (TVAC)",
+     "url": "https://data.public.lu/fr/datasets/comparaison-des-prix-de-carburants-par-motorisation/"
+    },
+    {
+     "id": "eurostat_earn_nt_net",
+     "name": "Eurostat - Net earnings, single person without children (earn_nt_net)",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/earn_nt_net/default/table"
+    }
+   ],
+   "followup": "Et pour une famille de 90 m², ou depuis Metz ?"
   },
   "q2": {
-   "text": "Sur 10 ans, c'est Weiswampach qui a le plus progressé, avec +61 % d'habitants. Viennent ensuite Saeul (+49,5 %), Contern (+42,6 %), Boulaide (+40,7 %) et Bous-Waldbredimus (+37,6 %). Ce sont des pourcentages : dans de petites communes, quelques nouveaux logements suffisent à faire fortement grimper le chiffre.",
+   "text": "Pour un logement de 90 m² à moins de 25 minutes en voiture de Belval, les loyers annoncés les plus bas sont en France : Villerupt (1278 €/mois, 19 min) et Audun-le-Tiche (1530 €, 18 min). Au Luxembourg, Frisange (2277 €, 21 min) et Kayl (2313 €, 24 min) arrivent ensuite ; Sanem, plus proche (14 min), est à 2637 €. Attention : ce sont des loyers annoncés, pas payés, et les trajets modélisés sous-estiment les bouchons à la frontière.",
    "communes": [
-    "0505",
-    "0707",
-    "0302",
-    "0801",
-    "1209"
+    "0205",
+    "0206",
+    "0213"
+   ],
+   "places": [
+    "fr:insee:54580",
+    "fr:insee:57038"
    ],
    "figures": [
     {
-     "commune": "0505",
-     "indicator": "pop_growth_10y",
-     "value": 61,
-     "year": 2026
+     "place": "fr:insee:54580",
+     "name": "Villerupt",
+     "country": "FR",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 1278,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "anil_loyers_2025"
+     ]
     },
     {
-     "commune": "0707",
-     "indicator": "pop_growth_10y",
-     "value": 49.5,
-     "year": 2026
+     "place": "fr:insee:54580",
+     "name": "Villerupt",
+     "country": "FR",
+     "indicator": "car_min@belval",
+     "label": {
+      "en": "Minutes by car to Belval (weekday morning)",
+      "fr": "Minutes en voiture vers Belval (matin de semaine)"
+     },
+     "value": 19,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "0302",
-     "indicator": "pop_growth_10y",
-     "value": 42.6,
-     "year": 2026
+     "place": "fr:insee:57038",
+     "name": "Audun-le-Tiche",
+     "country": "FR",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 1530,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "anil_loyers_2025"
+     ]
     },
     {
-     "commune": "0801",
-     "indicator": "pop_growth_10y",
-     "value": 40.7,
-     "year": 2026
+     "place": "fr:insee:57038",
+     "name": "Audun-le-Tiche",
+     "country": "FR",
+     "indicator": "car_min@belval",
+     "label": {
+      "en": "Minutes by car to Belval (weekday morning)",
+      "fr": "Minutes en voiture vers Belval (matin de semaine)"
+     },
+     "value": 18,
+     "unit": "min",
+     "year": null,
+     "sources": [
+      "chathome"
+     ]
     },
     {
-     "commune": "1209",
-     "indicator": "pop_growth_10y",
-     "value": 37.6,
-     "year": 2026
+     "place": "0205",
+     "name": "Frisange",
+     "country": "LU",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 2277,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0205",
+     "sources": [
+      "habitat_rents"
+     ]
+    },
+    {
+     "place": "0205",
+     "name": "Frisange",
+     "country": "LU",
+     "indicator": "car_min@belval",
+     "label": {
+      "en": "Minutes by car to Belval (weekday morning)",
+      "fr": "Minutes en voiture vers Belval (matin de semaine)"
+     },
+     "value": 21,
+     "unit": "min",
+     "year": null,
+     "commune": "0205",
+     "sources": [
+      "chathome"
+     ]
+    },
+    {
+     "place": "0206",
+     "name": "Kayl",
+     "country": "LU",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 2313,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0206",
+     "sources": [
+      "habitat_rents"
+     ]
+    },
+    {
+     "place": "0206",
+     "name": "Kayl",
+     "country": "LU",
+     "indicator": "car_min@belval",
+     "label": {
+      "en": "Minutes by car to Belval (weekday morning)",
+      "fr": "Minutes en voiture vers Belval (matin de semaine)"
+     },
+     "value": 24,
+     "unit": "min",
+     "year": null,
+     "commune": "0206",
+     "sources": [
+      "chathome"
+     ]
+    },
+    {
+     "place": "0213",
+     "name": "Sanem",
+     "country": "LU",
+     "indicator": "rent_month@90",
+     "label": {
+      "en": "Advertised rent for 90 m² per month",
+      "fr": "Loyer annoncé pour 90 m² par mois"
+     },
+     "value": 2637,
+     "unit": "€/month",
+     "year": 2026,
+     "commune": "0213",
+     "sources": [
+      "habitat_rents"
+     ]
+    },
+    {
+     "place": "0213",
+     "name": "Sanem",
+     "country": "LU",
+     "indicator": "car_min@belval",
+     "label": {
+      "en": "Minutes by car to Belval (weekday morning)",
+      "fr": "Minutes en voiture vers Belval (matin de semaine)"
+     },
+     "value": 14,
+     "unit": "min",
+     "year": null,
+     "commune": "0213",
+     "sources": [
+      "chathome"
+     ]
     }
    ],
    "sources": [
-    "statec_pop"
+    "anil_loyers_2025",
+    "chathome",
+    "habitat_rents"
    ],
-   "followup": "Quelles communes ont le plus d'habitants en valeur absolue ?"
+   "source_details": [
+    {
+     "id": "anil_loyers_2025",
+     "name": "ANIL / DGALN - Carte des loyers 2025 (appartements, charges comprises, annonces)",
+     "url": "https://www.data.gouv.fr/datasets/carte-des-loyers-indicateurs-de-loyers-dannonce-par-commune-en-2025"
+    },
+    {
+     "id": "chathome",
+     "name": "ChatHome - temps de trajet vers les pôles d'emploi (modèle tiers, matin de semaine)",
+     "url": "https://data.public.lu/en/datasets/temps-de-trajet-vers-les-poles-demploi-du-luxembourg-chathome/"
+    },
+    {
+     "id": "habitat_rents",
+     "name": "Observatoire de l'Habitat - Advertised rents by municipality",
+     "url": "https://data.public.lu/fr/datasets/loyers-annonces-des-logements-par-commune/"
+    }
+   ],
+   "followup": "Et en transports en commun, quelles options depuis ces communes vers Belval ?"
   },
   "q3": {
-   "text": "Parmi les communes pour lesquelles on dispose d'un prix, les appartements les moins chers au m² sont à Esch-sur-Sûre (5681 €/m²), Clervaux (5809 €/m²) et Wiltz (5894 €/m²). Viennent ensuite Goesdorf (6096 €/m²) et Rumelange (6466 €/m²). Ce sont des prix moyens demandés dans les annonces, de juillet 2025 à juin 2026. Seules 61 communes ont une valeur, car les autres avaient moins de 30 annonces.",
-   "communes": [
-    "0802",
-    "0501",
-    "0807",
-    "0804",
-    "0212"
-   ],
+   "text": "Sur la ligne Luxembourg-Trèves, la ponctualité était de 87,4 % en 2025. C'est un peu moins que la moyenne du réseau CFL (89,6 %), qui reste sous l'objectif de 92 %. Ce sont des moyennes annuelles : elles ne disent rien des retards un jour précis ni des heures de pointe.",
+   "communes": [],
+   "places": [],
    "figures": [
     {
-     "commune": "0802",
-     "indicator": "appt_price_m2",
-     "value": 5681,
-     "year": 2026
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "cfl_lux_trier_punctuality",
+     "label": {
+      "fr": "Ponctualité Luxembourg-Trèves",
+      "en": "Punctuality Luxembourg-Trier"
+     },
+     "value": 87.4,
+     "unit": "%",
+     "year": "2025",
+     "sources": [
+      "rel:https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025"
+     ]
     },
     {
-     "commune": "0501",
-     "indicator": "appt_price_m2",
-     "value": 5809,
-     "year": 2026
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "cfl_punctuality",
+     "label": {
+      "fr": "Ponctualité des trains CFL (ensemble du réseau)",
+      "en": "CFL train punctuality (whole network)"
+     },
+     "value": 89.6,
+     "unit": "%",
+     "year": "2025",
+     "sources": [
+      "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
+     ]
     },
     {
-     "commune": "0807",
-     "indicator": "appt_price_m2",
-     "value": 5894,
-     "year": 2026
-    },
-    {
-     "commune": "0804",
-     "indicator": "appt_price_m2",
-     "value": 6096,
-     "year": 2026
-    },
-    {
-     "commune": "0212",
-     "indicator": "appt_price_m2",
-     "value": 6466,
-     "year": 2026
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "cfl_punctuality_target",
+     "label": {
+      "fr": "Objectif de ponctualité CFL",
+      "en": "CFL punctuality target"
+     },
+     "value": 92,
+     "unit": "%",
+     "year": "2025",
+     "sources": [
+      "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
+     ]
     }
    ],
    "sources": [
-    "habitat"
+    "rel:https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025",
+    "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
    ],
-   "followup": "Et lesquelles sont les moins chères à moins de 15 km de Luxembourg-Ville ?"
+   "source_details": [
+    {
+     "id": "rel:https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025",
+     "name": "paperjam.lu",
+     "url": "https://paperjam.lu/article/luxembourg-treves-ponctualite-en-baisse-en-2025"
+    },
+    {
+     "id": "rel:https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/",
+     "name": "lesfrontaliers.lu",
+     "url": "https://www.lesfrontaliers.lu/mobilite/cfl-en-2025-presque-9-trains-sur-10-etaient-a-lheure-au-luxembourg/"
+    }
+   ],
+   "followup": "Comment se compare la ponctualité du TER Grand Est ?"
   },
   "q4": {
-   "text": "Esch-sur-Alzette compte 38 275 habitants contre 31 421 à Differdange, et elle est plus dense (2 667 contre 1 417 habitants/km²). Differdange a connu une croissance bien plus forte sur 10 ans (26,7 % contre 12,8 %). Le chômage est de 10,8 % à Esch et de 9,1 % à Differdange. Differdange compte aussi plus de jeunes de moins de 20 ans (23,7 % contre 21,4 %) et moins de 65 ans et plus (12,2 % contre 14,7 %). Les prix des appartements sont proches (7 325 €/m² à Esch, 7 198 €/m² à Differdange), Esch étant un peu plus proche de la ville de Luxembourg (17,1 km contre 20,4 km).",
+   "text": "Au 1er février 2026, la commune la plus endettée par habitant est Echternach avec 12 363 €/hab. Viennent ensuite Mertzig (11 537 €), Mamer (10 762 €), Bettembourg (10 617 €) et Préizerdaul (10 368 €). Ce sont des chiffres de dette communale rapportée à la population ; les données ne disent rien des causes.",
    "communes": [
-    "0204",
-    "0202"
+    "1005",
+    "0607",
+    "0108",
+    "0201",
+    "0702"
    ],
+   "places": [],
    "figures": [
     {
-     "commune": "0204",
-     "indicator": "pop",
-     "value": 38275,
+     "commune": "1005",
+     "indicator": "debt_pc",
+     "value": 12363,
      "year": 2026
     },
     {
-     "commune": "0202",
-     "indicator": "pop",
-     "value": 31421,
+     "commune": "0607",
+     "indicator": "debt_pc",
+     "value": 11537,
      "year": 2026
     },
     {
-     "commune": "0204",
-     "indicator": "density",
-     "value": 2667,
+     "commune": "0108",
+     "indicator": "debt_pc",
+     "value": 10762,
      "year": 2026
     },
     {
-     "commune": "0202",
-     "indicator": "density",
-     "value": 1417,
+     "commune": "0201",
+     "indicator": "debt_pc",
+     "value": 10617,
      "year": 2026
     },
     {
-     "commune": "0204",
-     "indicator": "pop_growth_10y",
-     "value": 12.8,
-     "year": 2026
-    },
-    {
-     "commune": "0202",
-     "indicator": "pop_growth_10y",
-     "value": 26.7,
-     "year": 2026
-    },
-    {
-     "commune": "0204",
-     "indicator": "unemployment_rate",
-     "value": 10.8,
-     "year": 2025
-    },
-    {
-     "commune": "0202",
-     "indicator": "unemployment_rate",
-     "value": 9.1,
-     "year": 2025
-    },
-    {
-     "commune": "0204",
-     "indicator": "under20_share",
-     "value": 21.4,
-     "year": 2026
-    },
-    {
-     "commune": "0202",
-     "indicator": "under20_share",
-     "value": 23.7,
-     "year": 2026
-    },
-    {
-     "commune": "0204",
-     "indicator": "over65_share",
-     "value": 14.7,
-     "year": 2026
-    },
-    {
-     "commune": "0202",
-     "indicator": "over65_share",
-     "value": 12.2,
+     "commune": "0702",
+     "indicator": "debt_pc",
+     "value": 10368,
      "year": 2026
     }
    ],
    "sources": [
-    "statec_pop",
-    "statec_density",
-    "statec_labour",
-    "rnpp",
-    "habitat",
-    "act"
+    "qp3719_debt"
    ],
-   "followup": "Quelles communes proches d'Esch ont des prix au m² plus bas ?"
+   "source_details": [
+    {
+     "id": "qp3719_debt",
+     "name": "Answer of the Minister of Home Affairs to parliamentary question no. 3719 (20.03.2026), annex: municipal debt at 01.02.2026 and loans in 2026 budgets",
+     "url": "https://wdocs-pub.chd.lu/docs/exped/2026/03/QP_62672_1774017035048.pdf"
+    }
+   ],
+   "followup": "Quelles communes ont la dette par habitant la plus faible ?"
   },
   "q5": {
-   "text": "Selon la part des 65 ans et plus, Mondorf-les-Bains arrive en tête avec 25,8 % de résidents âgés. Viennent ensuite Niederanven (23,1 %), Remich (22,7 %), Mondercange (21,3 %) et Diekirch (20,7 %). Ce sont des statistiques de 2026 par commune, qui décrivent la structure par âge sans jugement de valeur.",
+   "text": "Selon les données 2024, les classes les plus petites se trouvent à Waldbillig, avec 12,1 élèves par classe. Viennent ensuite Leudelange (13,4), puis Esch-sur-Alzette, Koerich et Troisvierges (13,5 chacune). Ce sont des moyennes communales, et certaines écoles sont partagées entre communes voisines.",
    "communes": [
-    "1204",
-    "0305",
-    "1205",
-    "0208",
-    "0603"
+    "1008",
+    "0207",
+    "0204",
+    "0106",
+    "0504"
    ],
+   "places": [],
    "figures": [
     {
-     "commune": "1204",
-     "indicator": "over65_share",
-     "value": 25.8,
-     "year": 2026
+     "commune": "1008",
+     "indicator": "pupils_per_class",
+     "value": 12.1,
+     "year": 2024
     },
     {
-     "commune": "0305",
-     "indicator": "over65_share",
-     "value": 23.1,
-     "year": 2026
+     "commune": "0207",
+     "indicator": "pupils_per_class",
+     "value": 13.4,
+     "year": 2024
     },
     {
-     "commune": "1205",
-     "indicator": "over65_share",
-     "value": 22.7,
-     "year": 2026
+     "commune": "0204",
+     "indicator": "pupils_per_class",
+     "value": 13.5,
+     "year": 2024
     },
     {
-     "commune": "0208",
-     "indicator": "over65_share",
-     "value": 21.3,
-     "year": 2026
+     "commune": "0106",
+     "indicator": "pupils_per_class",
+     "value": 13.5,
+     "year": 2024
     },
     {
-     "commune": "0603",
-     "indicator": "over65_share",
-     "value": 20.7,
-     "year": 2026
+     "commune": "0504",
+     "indicator": "pupils_per_class",
+     "value": 13.5,
+     "year": 2024
     }
    ],
    "sources": [
-    "rnpp"
+    "statec_schools"
    ],
-   "followup": "Quelles communes ont la population la plus jeune ?"
+   "source_details": [
+    {
+     "id": "statec_schools",
+     "name": "STATEC / MENJE - Fundamental schools by municipality (DF_X046)",
+     "url": "https://lustat.statec.lu/vis?df[ds]=ds-release&df[ag]=LU1&df[id]=DF_X046"
+    }
+   ],
+   "followup": "Où les classes sont-elles les plus grandes ?"
   },
   "q6": {
-   "text": "Le chômage le plus bas se trouve dans trois communes à égalité : Heffingen, Nommern et Weiler-la-Tour, avec 2,5 %. Viennent ensuite Saeul et Schieren, à 2,9 %. Ce sont des statistiques communales, à interpréter avec prudence, surtout pour les petites communes.",
-   "communes": [
-    "0405",
-    "0410",
-    "0311",
-    "0707",
-    "0609"
-   ],
+   "text": "Aucune source ouverte ne publie ce que gagnent les frontaliers eux-mêmes ; on ne peut donc comparer que des pays, pas des personnes. Salaire net moyen d'une personne seule : 4 656 € au Luxembourg, contre 2 696 € en France, 3 035 € en Belgique et 3 045 € en Allemagne. Le salaire minimum est de 2 771 € au Luxembourg, contre 1 867 € en France.",
+   "communes": [],
+   "places": [],
    "figures": [
     {
-     "commune": "0405",
-     "indicator": "unemployment_rate",
-     "value": 2.5,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_lu",
+     "label": {
+      "en": "Average net monthly earnings, LU (single, no children)",
+      "fr": "Salaire net mensuel moyen, LU (célibataire sans enfant)"
+     },
+     "value": 4656,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0410",
-     "indicator": "unemployment_rate",
-     "value": 2.5,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_fr",
+     "label": {
+      "en": "Average net monthly earnings, FR (single, no children)",
+      "fr": "Salaire net mensuel moyen, FR (célibataire sans enfant)"
+     },
+     "value": 2696,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0311",
-     "indicator": "unemployment_rate",
-     "value": 2.5,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_be",
+     "label": {
+      "en": "Average net monthly earnings, BE (single, no children)",
+      "fr": "Salaire net mensuel moyen, BE (célibataire sans enfant)"
+     },
+     "value": 3035,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0707",
-     "indicator": "unemployment_rate",
-     "value": 2.9,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "net_monthly_de",
+     "label": {
+      "en": "Average net monthly earnings, DE (single, no children)",
+      "fr": "Salaire net mensuel moyen, DE (célibataire sans enfant)"
+     },
+     "value": 3045,
+     "unit": "€/month",
+     "year": 2025,
+     "sources": [
+      "eurostat_earn_nt_net"
+     ]
     },
     {
-     "commune": "0609",
-     "indicator": "unemployment_rate",
-     "value": 2.9,
-     "year": 2025
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "min_wage_lu",
+     "label": {
+      "en": "Monthly minimum wage, LU",
+      "fr": "Salaire minimum mensuel, LU"
+     },
+     "value": 2771,
+     "unit": "€/month",
+     "year": "2026-S2",
+     "sources": [
+      "eurostat_earn_mw_cur"
+     ]
+    },
+    {
+     "place": "national",
+     "name": "Luxembourg",
+     "indicator": "min_wage_fr",
+     "label": {
+      "en": "Monthly minimum wage, FR",
+      "fr": "Salaire minimum mensuel, FR"
+     },
+     "value": 1867,
+     "unit": "€/month",
+     "year": "2026-S2",
+     "sources": [
+      "eurostat_earn_mw_cur"
+     ]
     }
    ],
    "sources": [
-    "statec_labour"
+    "eurostat_earn_nt_net",
+    "eurostat_earn_mw_cur"
    ],
-   "followup": "Et où le chômage est-il le plus élevé ?"
+   "source_details": [
+    {
+     "id": "eurostat_earn_nt_net",
+     "name": "Eurostat - Net earnings, single person without children (earn_nt_net)",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/earn_nt_net/default/table"
+    },
+    {
+     "id": "eurostat_earn_mw_cur",
+     "name": "Eurostat - Monthly minimum wages (earn_mw_cur)",
+     "url": "https://ec.europa.eu/eurostat/databrowser/view/earn_mw_cur/default/table"
+    }
+   ],
+   "followup": "Combien reste-t-il après loyer et carburant en vivant à Thionville ou à Luxembourg ?"
   }
  }
 }

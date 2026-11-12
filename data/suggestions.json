@@ -1,8 +1,8 @@
 {
-  "q1": {"en": "Where should a young family live near Kirchberg?", "fr": "Où vivre en jeune famille près du Kirchberg ?"},
-  "q2": {"en": "Which communes grew fastest over the last 10 years?", "fr": "Quelles communes ont le plus grandi en 10 ans ?"},
-  "q3": {"en": "Where are apartments cheapest per m²?", "fr": "Où les appartements sont-ils les moins chers au m² ?"},
-  "q4": {"en": "Compare Esch-sur-Alzette and Differdange.", "fr": "Compare Esch-sur-Alzette et Differdange."},
-  "q5": {"en": "Which communes have the oldest population?", "fr": "Quelles communes ont la population la plus âgée ?"},
-  "q6": {"en": "Where is unemployment lowest?", "fr": "Où le chômage est-il le plus bas ?"}
+  "q1": {"en": "Live in Thionville or Luxembourg City if I work at Kirchberg?", "fr": "Vivre à Thionville ou à Luxembourg-Ville si je travaille au Kirchberg ?"},
+  "q2": {"en": "Where can a family rent near Belval for less?", "fr": "Où une famille peut-elle louer moins cher près de Belval ?"},
+  "q3": {"en": "How reliable are trains from Trier?", "fr": "Les trains depuis Trèves sont-ils fiables ?"},
+  "q4": {"en": "Which communes are most indebted per resident?", "fr": "Quelles communes sont les plus endettées par habitant ?"},
+  "q5": {"en": "Where are school classes smallest?", "fr": "Où les classes d'école sont-elles les plus petites ?"},
+  "q6": {"en": "How much do cross-border workers earn compared to residents?", "fr": "Combien gagnent les frontaliers par rapport aux résidents ?"}
 }

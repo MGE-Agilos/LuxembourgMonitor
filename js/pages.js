@@ -125,6 +125,14 @@ function problemCard(id, title, value, text, sources) {
   return { card, body };
 }
 
+// "2026-04" -> "April 2026" / "avril 2026"; anything else unchanged.
+function monthName(ym, lang) {
+  const m = /^(\d{4})-(\d{2})$/.exec(String(ym ?? ""));
+  if (!m) return ym ?? "–";
+  return new Intl.DateTimeFormat(lang === "fr" ? "fr-LU" : "en-GB", { month: "long", year: "numeric", timeZone: "UTC" })
+    .format(new Date(Date.UTC(+m[1], +m[2] - 1, 1)));
+}
+
 export function problems({ compact = false } = {}) {
   const lang = getLang();
   const st = data(), ov = st.ouvivre, ref = ov.reference, rel = ov.reliability || {};
@@ -169,9 +177,22 @@ export function problems({ compact = false } = {}) {
   }
   grid.append(tr.card);
 
-  // 4 childcare: not published per commune (no number in our data)
-  const cr = problemCard("creches", t("pr.creches"), t("pr.creches.v"), t("pr.creches.s"), []);
-  cr.card.querySelector(".kpi-value").classList.add("pr-word");
+  // 4 childcare: national figures only (national.json facts, press report of ministry figures)
+  const fc = st.national?.facts || {};
+  const cp = fc.childcare_places, cp0 = fc.childcare_places_prev, cu = fc.childcare_unoccupied;
+  const factSrc = (f) => (f ? { name: `${f.source.name} — ${host(f.source.url)}`, url: f.source.url, year: f.year } : null);
+  let cr;
+  if (cp) {
+    const gc = cp0 ? cp.v / cp0.v - 1 : null;
+    cr = problemCard("creches", t("pr.creches"), num(cp.v),
+      compact ? t("pr.creches.u", { y: cp.year }) : `${t("pr.creches.u", { y: cp.year })}. ${t("pr.creches.s", {
+        g: gc === null ? "–" : signed(pct(gc), gc), y0: cp0?.year ?? "–", p: cp0 ? num(cp0.v) : "–",
+        f: cu ? num(cu.v) : "–", m: monthName(cu?.year, lang),
+      })}`, [factSrc(cp)].filter(Boolean));
+  } else {
+    cr = problemCard("creches", t("pr.creches"), t("pr.creches.v"), t("pr.creches.na"), []);
+    cr.card.querySelector(".kpi-value").classList.add("pr-word");
+  }
   cr.body.append(link(t("pr.creches.link"), "#/sources", "pr-link"));
   grid.append(cr.card);
 
@@ -295,6 +316,13 @@ export function sourceList() {
     byUrl.set(r.source, e);
   }
   for (const e of byUrl.values()) add(e);
+  const facts = new Map();
+  for (const f of Object.values(st.national?.facts || {})) {
+    const e = facts.get(f.source.url) || { name: f.source.name, url: f.source.url, level: "national", date: f.year, labels: [] };
+    if (!e.labels.some((l) => l.en === f.label.en)) e.labels.push(f.label);
+    facts.set(f.source.url, e);
+  }
+  for (const e of facts.values()) add(e);
   return list;
 }
 

@@ -2,6 +2,22 @@ import { ASK_TIMEOUT_MS, ASK_URL, VIDEO } from "./config.js";
 import { data, displayName, fmt, label, sourceName } from "./data.js";
 import { h, sleep } from "./dom.js";
 import { getLang, t } from "./i18n.js";
+import { extLink } from "./ui.js";
+
+const UNIT_FR = { "€/month": "€/mois", "€/inh.": "€/hab.", places: "places", h: "h" };
+const UNIT_EN = { places: "places" };
+
+// Figure of the v2 answer (cross-border place, canton or national): the server sends its label, unit and year.
+export function figureText(f, lang, { communeName = (l) => l } = {}) {
+  if (!f.label) return null;
+  const name = f.place === "national" ? t("ask.national") : f.commune ? communeName(f.commune) : f.name || f.place;
+  const d = Number.isInteger(f.value) ? 0 : 1;
+  const s = new Intl.NumberFormat(lang === "fr" ? "fr-LU" : "en-GB", { maximumFractionDigits: d }).format(f.value);
+  const u = (lang === "fr" ? UNIT_FR[f.unit] : UNIT_EN[f.unit]) ?? f.unit ?? "";
+  const v = !u ? s : u === "%" ? (lang === "fr" ? `${s} %` : `${s}%`) : `${s} ${u}`;
+  const label = f.label[lang] || f.label.en;
+  return `${name} — ${label} : ${v}${f.year != null && f.year !== "" ? ` (${f.year})` : ""}`;
+}
 
 let fallback = null;
 async function loadFallback() {
@@ -19,7 +35,9 @@ async function loadFallback() {
 export function isValid(res) {
   return !!res && typeof res.text === "string"
     && (res.communes === undefined || (Array.isArray(res.communes) && res.communes.every((x) => typeof x === "string")))
-    && (res.figures === undefined || (Array.isArray(res.figures) && res.figures.every((f) => f && typeof f.value === "number")));
+    && (res.places === undefined || (Array.isArray(res.places) && res.places.every((x) => typeof x === "string")))
+    && (res.figures === undefined || (Array.isArray(res.figures) && res.figures.every((f) => f && typeof f.value === "number"
+      && (f.label === undefined || (f.label && typeof f.label === "object")))));
 }
 
 export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = ASK_TIMEOUT_MS, signal } = {}) {
@@ -120,20 +138,41 @@ export function renderAssistant(el, { lau, map, onSelect }) {
       }
       box.append(row);
     }
+    const ovPlaces = new Map((st.ouvivre?.places || []).map((p) => [p.id, p]));
+    const cross = (res.places || []).map((id) => ovPlaces.get(id)).filter(Boolean);
+    if (cross.length) {
+      const row = h("div", "lm-row lm-places");
+      row.append(h("span", "muted small", `${t("ask.places")} :`));
+      for (const p of cross) {
+        const b = h("button", "btn small", `${p.name} (${p.country})`);
+        b.type = "button";
+        b.onclick = () => { location.hash = `#/p/${encodeURIComponent(p.id)}`; };
+        row.append(b);
+      }
+      box.append(row);
+    }
     if (res.figures?.length) {
       box.append(h("p", "section-title", t("ask.figures")));
       const ul = h("ul", "lm-figs");
+      const communeName = (l) => { const c = st.byLau.get(l); return c ? displayName(c, lang) : l; };
       for (const f of res.figures) {
-        const fc = st.byLau.get(f.commune);
-        const name = fc ? displayName(fc, lang) : f.commune;
-        ul.append(h("li", null, `${name} — ${label(f.indicator, lang)} : ${fmt(f.value, f.indicator, lang)} (${f.year})`));
+        const v2 = figureText(f, lang, { communeName });
+        ul.append(h("li", null, v2 ?? `${communeName(f.commune)} — ${label(f.indicator, lang)} : ${fmt(f.value, f.indicator, lang)} (${f.year})`));
       }
       box.append(ul);
     }
     if (res.sources?.length) {
       const row = h("div", "lm-row");
       row.append(h("span", "muted small", `${t("ask.sources")} :`));
-      for (const s of res.sources) row.append(h("span", "chip", sourceName(s)));
+      const details = new Map((res.source_details || []).map((x) => [x.id, x]));
+      for (const id of res.sources) {
+        const d = details.get(id);
+        const known = st.meta.sources[id] || st.ouvivre?.sources?.[id];
+        const name = known?.name || d?.name || sourceName(id);
+        const chip = h("span", "chip");
+        chip.append(extLink(name, known?.url || d?.url || ""));
+        row.append(chip);
+      }
       box.append(row);
     }
     if (res.followup) {
