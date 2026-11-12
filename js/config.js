@@ -1,5 +1,5 @@
 // Runtime settings. DEFAULT_ASK_URL is filled in task 21 with the deployed Supabase function URL.
-const DEFAULT_ASK_URL = "";
+const DEFAULT_ASK_URL = "https://vxwmhsgxoomcbiukeinp.supabase.co/functions/v1/luxembourg-monitor-ask";
 const params = new URLSearchParams(location.search);
 const ask = params.get("ask");
 
