@@ -3,6 +3,7 @@ const DICT = {
     byline: "by Beyond Data",
     "search.label": "Find a commune",
     "search.placeholder": "Find your commune…",
+    "err.load": "The data could not be loaded. Please reload the page.",
     "ask.title": "Ask the data",
     "ask.placeholder": "Ask about any of the 100 communes…",
     "ask.send": "Ask",
@@ -32,6 +33,7 @@ const DICT = {
     byline: "par Beyond Data",
     "search.label": "Trouver une commune",
     "search.placeholder": "Trouvez votre commune…",
+    "err.load": "Les données n'ont pas pu être chargées. Rechargez la page.",
     "ask.title": "Interroger les données",
     "ask.placeholder": "Posez une question sur l'une des 100 communes…",
     "ask.send": "Demander",
@@ -82,7 +84,7 @@ export function setLang(l) {
 
 export function t(key, vars = {}) {
   let s = DICT[lang][key] ?? DICT.en[key] ?? key;
-  for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, v);
+  for (const [k, v] of Object.entries(vars)) s = s.replaceAll(`{${k}}`, () => String(v));
   return s;
 }
 

@@ -34,11 +34,21 @@ export function fmt(v, id, lang) {
   return `${s} ${u}`;
 }
 
-export function findCommune(q) {
+// The City of Luxembourg (LAU 0304) is shown as "Luxembourg City" / "Luxembourg-Ville", never just the country name.
+export function displayName(c, lang) {
+  if (c.lau === "0304") return lang === "fr" ? "Luxembourg-Ville" : "Luxembourg City";
+  return c.name;
+}
+
+const CITY_ALIASES = new Set(["luxembourgcity", "luxembourgville", "villedeluxembourg"]);
+
+export function findCommune(q, { exact = false } = {}) {
   const n = norm(q);
   if (!n) return null;
-  return state.communes.find((c) => norm(c.name) === n)
-    || state.communes.find((c) => norm(c.name).startsWith(n)) || null;
+  if (CITY_ALIASES.has(n)) return state.byLau.get("0304") || null;
+  const exactHit = state.communes.find((c) => norm(c.name) === n);
+  if (exactHit || exact) return exactHit || null;
+  return state.communes.find((c) => norm(c.name).startsWith(n)) || null;
 }
 
 export function sourceName(id) {
