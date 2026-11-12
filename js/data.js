@@ -5,11 +5,11 @@ export function norm(s) {
 }
 
 export async function loadData(base = "data/") {
-  const names = ["meta", "communes", "carte", "faits", "suggestions"];
-  const [meta, communes, carte, faits, suggestions] = await Promise.all(names.map((n) =>
+  const names = ["meta", "communes", "carte", "faits", "suggestions", "ouvivre"];
+  const [meta, communes, carte, faits, suggestions, ouvivre] = await Promise.all(names.map((n) =>
     fetch(`${base}${n}.json`).then((r) => { if (!r.ok) throw new Error(`${n}.json ${r.status}`); return r.json(); })));
   state = {
-    meta, communes, carte, faits, suggestions,
+    meta, communes, carte, faits, suggestions, ouvivre,
     byLau: new Map(communes.map((c) => [c.lau, c])),
     ind: new Map(meta.indicators.map((m) => [m.id, m])),
   };
