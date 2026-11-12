@@ -3,6 +3,7 @@
 import { TABS, rankText, srcOf, valueText } from "./commune.js";
 import { data, displayName, label, norm } from "./data.js";
 import { h } from "./dom.js";
+import { estMark, estText } from "./estimate.js";
 import { placeName } from "./grmap.js";
 import { getLang, t } from "./i18n.js";
 import { HUBS, computePlaces } from "./ouvivre.js";
@@ -82,6 +83,7 @@ function table(cols, rows, lang) {
     r.values.forEach((v, i) => {
       const td = h("td", v.cls || null);
       td.append(h("span", "cmp-v", v.text));
+      if (v.est) td.append(estMark(v.est));
       if (v.sub) td.append(h("span", "cmp-sub", v.sub));
       if (i === best) {
         td.classList.add("is-best");
@@ -100,15 +102,18 @@ function dailyRows(places, lang, hub = currentHub()) {
   const st = data(), ov = st.ouvivre;
   const size = ouvivreState().size || 70;
   const calc = (tenure) => {
-    const all = computePlaces({ ...ov, places: places.map((r) => r.p).filter(Boolean) }, { hub, size_m2: size, tenure });
+    const all = computePlaces({ ...ov, places: places.map((r) => r.p).filter(Boolean) }, { hub, size_m2: size, tenure, useEstimates: !ouvivreState().officialOnly });
     return places.map((r) => (r.p ? all.find((q) => q.id === r.p.id) : null));
   };
   const rent = calc("rent"), buy = calc("buy");
   const src = (key) => {
     const ids = new Set(places.map((r) => r.p?.src?.[key]).filter(Boolean));
+    if (key === "rent_m2") rent.forEach((q) => q?.rent_estimated && q.rent_est?.source_ids?.forEach((i) => ids.add(i)));
+    if (key === "sale_price_m2") buy.forEach((q) => q?.price_estimated && q.sale_est?.source_ids?.forEach((i) => ids.add(i)));
     return [...ids].map((id) => ov.sources[id]).filter(Boolean).map((s) => ({ name: s.name, url: s.url }));
   };
-  const cell = (v, text, sub) => (v === null || v === undefined ? { raw: null, text: t("np"), cls: "np" } : { raw: v, text, sub });
+  const cell = (v, text, sub, est = null) => (v === null || v === undefined ? { raw: null, text: t("np"), cls: "np" } : { raw: v, text, sub, est });
+  const rEst = (q) => (q?.rent_estimated ? estText(q, "rent") : null);
   const hubName = t(`hub.${hub}`);
   const salary = ov.reference.sources?.[0];
   const fuel = ov.sources[ov.assumptions?.fuel_price_source];
@@ -118,11 +123,11 @@ function dailyRows(places, lang, hub = currentHub()) {
     { label: t("d.dist"), sens: 0, sources: src("coords"),
       values: rent.map((q) => cell(q?.dist_lux_km, q?.dist_lux_km == null ? "" : `${num(q.dist_lux_km, 1)} km`)) },
     { label: t("d.rent_m2"), sens: -1, sources: src("rent_m2"),
-      values: rent.map((q) => cell(q?.rent_m2, q?.rent_m2 == null ? "" : `${num(q.rent_m2, 1)} €/m²`)) },
+      values: rent.map((q) => { const v = q?.rent_m2 ?? (q?.rent_estimated ? q.rent_m2_est : null); return cell(v, v == null ? "" : `${num(v, 1)} €/m²`, null, rEst(q)); }) },
     { label: t("cmp.rent_size", { s: size }), sens: -1, sources: src("rent_m2"),
-      values: rent.map((q) => cell(q?.rent_month, q?.rent_month == null ? "" : eur(q.rent_month))) },
+      values: rent.map((q) => cell(q?.rent_month, q?.rent_month == null ? "" : eur(q.rent_month), null, rEst(q))) },
     { label: t("d.sale_m2"), sens: -1, sources: src("sale_price_m2"),
-      values: buy.map((q) => cell(q?.sale_price_m2, q?.sale_price_m2 == null ? "" : `${num(q.sale_price_m2)} €/m²`)) },
+      values: buy.map((q) => { const v = q?.sale_price_m2 ?? (q?.price_estimated ? q.sale_price_m2_est : null); return cell(v, v == null ? "" : `${num(v)} €/m²`, null, q?.price_estimated ? estText(q, "price") : null); }) },
     { label: t("cmp.car", { hub: hubName }), sens: -1, sources: src("commute"),
       values: rent.map((q) => cell(q?.car_min, `${q?.car_min} min`, q?.car_km == null ? null : `${num(q.car_km, 1)} km`)) },
     { label: t("cmp.tc", { hub: hubName }), sens: -1, sources: src("commute"),
@@ -132,7 +137,7 @@ function dailyRows(places, lang, hub = currentHub()) {
     { label: t("cmp.left_size", { s: size }), sens: 1,
       sources: [...src("rent_m2"), ...(salary ? [{ name: salary.name, url: salary.url, year: ov.reference.net_year_lu }] : []),
         ...(fuel ? [{ name: fuel.name, url: fuel.url, year: ov.assumptions.fuel_price_period }] : [])],
-      values: rent.map((q) => cell(q?.left_month, q?.left_month == null ? "" : eur(q.left_month), t("s.left"))) },
+      values: rent.map((q) => cell(q?.left_month, q?.left_month == null ? "" : eur(q.left_month), t("s.left"), rEst(q))) },
   ];
 }
 

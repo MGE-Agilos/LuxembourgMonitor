@@ -5,6 +5,7 @@ import { KIOSK } from "./config.js";
 import { compareTable } from "./compare.js";
 import { h } from "./dom.js";
 import { fmt, label } from "./data.js";
+import { estMark, estText, officialOnly, setOfficialOnly } from "./estimate.js";
 import { placeName } from "./grmap.js";
 import { getLang, t } from "./i18n.js";
 import { COUNTRIES, HUBS, SIZES, computePlaces, rank, referenceHourlyWage, sortValue } from "./ouvivre.js";
@@ -38,7 +39,7 @@ const fresh = () => ({
   // Kirchberg (the largest business district) is shown by default so the map carries the ranking from the start;
   // `touched` tells whether the visitor has interacted (kiosk attract mode runs until then).
   hub: "kirchberg", touched: false, size: 70, tenure: "rent", sort: "left", timeValue: 0, countries: new Set(COUNTRIES), selected: null, shown: PAGE,
-  tab: "rank", cmp: [], detail: null, colSrc: null, ctrlOpen: true,
+  tab: "rank", cmp: [], detail: null, colSrc: null, ctrlOpen: true, officialOnly: officialOnly(),
 });
 let S = fresh();
 export function resetOuvivre() { S = fresh(); }
@@ -233,13 +234,18 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
   }
 
   // ---- figures of a place (phone card and wide detail drawer), each with its source on tap
-  function figure(host, key, value, subs, sources) {
+  function figure(host, key, value, subs, sources, estNote = null) {
     const box = h("div", "ov-num");
     box.append(h("span", "ov-k", key));
-    box.append(value === null ? h("span", "ov-v np", t("np")) : h("span", "ov-v", value));
+    if (value === null) box.append(h("span", "ov-v np", t("np")));
+    else if (estNote) {
+      const v = h("span", "ov-v is-est", value);
+      v.append(estMark(estNote));
+      box.append(v);
+    } else box.append(h("span", "ov-v", value));
     for (const s of subs.filter(Boolean)) { const sp = h("span", "ov-s", s); sp.title = s; box.append(sp); }
     const srcs = sources.filter((s) => s && s.name);
-    if (srcs.length) {
+    if (srcs.length || (estNote && value !== null)) {
       const i = btn("ov-i", "i", () => {
         const out = host.querySelector(".ov-src");
         const same = out.dataset.k === key && !out.hidden;
@@ -249,6 +255,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
         i.setAttribute("aria-expanded", String(!same));
         if (same) return;
         out.append(document.createTextNode(`${key} — `));
+        if (estNote) out.append(h("strong", null, `${estNote}${srcs.length ? " — " : ""}`));
         sourceNodes(out, srcs);
       });
       i.setAttribute("aria-label", `${t("src.btn")} : ${key}`);
@@ -259,7 +266,9 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
   }
 
   function figures(host, p, { compact }) {
-    const housingSrc = srcOf(S.tenure === "rent" ? p.src.rent_m2 : p.src.sale_price_m2);
+    const estE = S.tenure === "rent" ? (p.rent_estimated ? p.rent_est : null) : (p.price_estimated ? p.sale_est : null);
+    const estNote = estE ? estText(p, S.tenure === "rent" ? "rent" : "price") : null;
+    const housingSrc = srcOf(S.tenure === "rent" ? p.src.rent_m2 : p.src.sale_price_m2) || (estE ? srcOf(estE.source_ids?.[0]) : null);
     const commuteSrc = srcOf(p.src.commute);
     const fuelSrc = p.fuel_cost_month === null ? null : {
       name: `${t("d.fuel")} : ${eur(p.fuel_cost_month, lang)} (${t("d.fuel_basis", {
@@ -268,10 +277,10 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const nums = h("div", "ov-nums");
     if (S.tenure === "rent") {
       nums.append(figure(host, t("k.rent"), p.rent_month === null ? null : eur(p.rent_month, lang),
-        [p.share_of_lu_net === null ? null : t("s.share", { p: pct(p.share_of_lu_net, lang) })], [housingSrc, p.share_of_lu_net === null ? null : sal]));
+        [p.share_of_lu_net === null ? null : t("s.share", { p: pct(p.share_of_lu_net, lang) })], [housingSrc, p.share_of_lu_net === null ? null : sal], estNote));
     } else {
       nums.append(figure(host, t("k.price"), p.price_total === null ? null : eurBig(p.price_total, lang),
-        [p.years_of_lu_net === null ? null : t("s.years", { y: num(p.years_of_lu_net, lang, 1) })], [housingSrc, p.years_of_lu_net === null ? null : sal]));
+        [p.years_of_lu_net === null ? null : t("s.years", { y: num(p.years_of_lu_net, lang, 1) })], [housingSrc, p.years_of_lu_net === null ? null : sal], estNote));
     }
     nums.append(figure(host, t("k.time"), p.car_min === null ? null : `${p.car_min} min`, p.car_min === null
       ? [p.dist_lux_km === null ? null : t("s.dist", { km: num(p.dist_lux_km, lang, 0) })]
@@ -286,7 +295,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
           compact || p.left_month === null || p.hours_month_car === null ? null : t("s.hours", { h: num(p.hours_month_car, lang, 0) }),
           !timed ? null : t("s.time", { c: eur(p.time_cost_month, lang), h: num(p.time_hours_month, lang, 0), v: S.timeValue }),
           !timed || compact || p.balance_month === null ? null : t("s.balance", { b: eur(p.balance_month, lang) })],
-        [p.left_month === null ? null : housingSrc, p.left_month === null ? null : sal, p.left_month === null ? null : fuelSrc]));
+        [p.left_month === null ? null : housingSrc, p.left_month === null ? null : sal, p.left_month === null ? null : fuelSrc], p.left_month === null ? null : estNote));
     } else {
       nums.append(figure(host, t("k.left"), "—", [t("s.left_buy")], []));
     }
@@ -307,16 +316,21 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     detailRow(dl, t("d.hours_car"), p.hours_month_car === null ? null : `${num(p.hours_month_car, lang, 0)} h`);
     detailRow(dl, t("d.hours_tc"), p.hours_month_transit === null ? null
       : `${num(p.hours_month_transit, lang, 0)} h (${p.hours_month_transit_p80 === null ? "–" : num(p.hours_month_transit_p80, lang, 0)} h)`);
-    detailRow(dl, t("d.rent_m2"), p.rent_m2 === null ? null : `${num(p.rent_m2, lang, 1)} €/m²`);
+    detailRow(dl, t("d.rent_m2"), p.rent_m2 !== null ? `${num(p.rent_m2, lang, 1)} €/m²`
+      : p.rent_estimated && p.rent_m2_est !== null ? `${num(p.rent_m2_est, lang, 1)} €/m² (${t("est.short")})` : null);
     detailRow(dl, t("d.rent_range"), p.rent_range ? `${num(p.rent_range[0], lang, 1)} – ${num(p.rent_range[1], lang, 1)} €/m²` : null);
-    detailRow(dl, t("d.sale_m2"), p.sale_price_m2 === null ? null : `${num(p.sale_price_m2, lang)} €/m²`);
+    detailRow(dl, t("d.sale_m2"), p.sale_price_m2 !== null ? `${num(p.sale_price_m2, lang)} €/m²`
+      : p.price_estimated && p.sale_price_m2_est !== null ? `${num(p.sale_price_m2_est, lang)} €/m² (${t("est.short")})` : null);
     detailRow(dl, t("d.house_lu"), p.house_price === null ? null : eur(p.house_price, lang));
     detailRow(dl, t("d.house_be"), p.house_price_median === null ? null : eur(p.house_price_median, lang));
     detailRow(dl, t("d.appt_be"), p.appt_price_median === null ? null : eur(p.appt_price_median, lang));
     const out = [dl];
     if (p.notes.length) {
       const ul = h("ul", "ov-notes");
-      for (const n of p.notes) ul.append(h("li", null, t(`note.${n}`)));
+      for (const n of p.notes) {
+        const m = /^(rent|price)_estimate_/.exec(n);
+        ul.append(h("li", m ? "ov-estnote" : null, m ? estText(p, m[1]) : t(`note.${n}`)));
+      }
       out.push(ul);
     }
     return out;
@@ -383,14 +397,17 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const rent = S.tenure === "rent";
     const tv = rent && S.timeValue > 0;
     const pick = (key) => uniqSrc(ranked.map((p) => srcOf(p.src?.[key])));
-    const housingS = pick(rent ? "rent_m2" : "sale_price_m2");
+    const estIds = ranked.filter((p) => (rent ? p.rent_estimated : p.price_estimated)).flatMap((p) => (rent ? p.rent_est : p.sale_est)?.source_ids || []);
+    const housingS = uniqSrc([...pick(rent ? "rent_m2" : "sale_price_m2"), ...[...new Set(estIds)].map(srcOf)]);
     const commuteS = pick("commute");
     const salS = sal ? [sal] : [];
     const fuelS = A.fuel_price_source ? [srcOf(A.fuel_price_source)] : [];
     const cols = [
       { k: "housing", label: rent ? t("k.rent") : t("k.price"), sort: "housing", src: housingS,
+        est: (p) => (rent ? p.rent_estimated : p.price_estimated),
         v: (p) => (rent ? (p.rent_month === null ? null : eur(p.rent_month, lang)) : (p.price_total === null ? null : eurBig(p.price_total, lang))) },
       { k: "share", label: rent ? t("col.share") : t("col.years"), sort: "housing", src: uniqSrc([...housingS, ...salS]),
+        est: (p) => (rent ? p.rent_estimated : p.price_estimated),
         v: (p) => (rent ? (p.share_of_lu_net === null ? null : pct(p.share_of_lu_net, lang)) : (p.years_of_lu_net === null ? null : num(p.years_of_lu_net, lang, 1))) },
       { k: "car", label: t("col.car"), sort: "time", src: commuteS, v: (p) => (p.car_min === null ? null : t("ov.min", { m: p.car_min })) },
       { k: "tc", label: t("col.tc"), sub: t("col.tc80"), src: commuteS,
@@ -400,6 +417,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     ];
     if (rent) {
       cols.push({ k: "left", label: tv ? t("sort.balance") : t("k.left"), sort: "left", src: uniqSrc([...housingS, ...salS, ...fuelS]),
+        est: (p) => p.rent_estimated,
         v: (p) => { const x = tv ? p.balance_month : p.left_month; return x === null ? null : eur(x, lang); },
         title: (p) => (tv && p.time_cost_month !== null && p.left_month !== null
           ? `${t("k.left")} ${eur(p.left_month, lang)} · ${t("s.time", { c: eur(p.time_cost_month, lang), h: num(p.time_hours_month, lang, 0), v: S.timeValue })}`
@@ -481,9 +499,14 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
       tr.append(tdc, tdr, th);
       for (const c of cols) {
         const td = h("td", by === c.sort ? "is-sort" : null);
-        cellOf(td, c.v(p));
+        const cv = c.v(p);
+        cellOf(td, cv);
         const tt = c.title?.(p);
         if (tt) td.title = tt;
+        if (cv !== null && c.est?.(p)) {
+          td.classList.add("is-est");
+          td.append(estMark(estText(p, S.tenure === "rent" ? "rent" : "price")));
+        }
         tr.append(td);
       }
       tr.onclick = (e) => { if (!e.target.closest("label, input, button")) openDetail(p.id); };
@@ -650,7 +673,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
   let current = [];
   function computeRanked() {
     const by = effectiveSort();
-    const places = computePlaces(ov, { hub: S.hub, size_m2: S.size, tenure: S.tenure, timeValue: S.timeValue });
+    const places = computePlaces(ov, { hub: S.hub, size_m2: S.size, tenure: S.tenure, timeValue: S.timeValue, useEstimates: !S.officialOnly });
     const ranked = rank(places.filter((p) => S.countries.has(p.country)), by);
     return { by, places, ranked };
   }
@@ -814,7 +837,20 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     if (S.tab !== "rank" && S.hub) { const r = computeRanked(); current = r.ranked; drawMap(r.places, r.ranked, r.by); }
 
     const status = h("div", "ov-status");
-    if (S.hub) status.append(h("span", "ov-count", t("ov.count", { n: current.length, hub: t(`hub.${S.hub}`), size: S.size })));
+    if (S.hub) {
+      const nEst = current.filter((p) => sortValue(p, effectiveSort()) !== null && (S.tenure === "rent" ? p.rent_estimated : p.price_estimated)).length;
+      status.append(h("span", "ov-count", `${t("ov.count", { n: current.length, hub: t(`hub.${S.hub}`), size: S.size })}${nEst ? ` · ${t("ov.nest", { n: nEst })}` : ""}`));
+      const off = pressed(btn("ov-off", t("ov.official"), () => {
+        S.officialOnly = !S.officialOnly;
+        setOfficialOnly(S.officialOnly);
+        S.touched = true;
+        onChange?.();
+        draw();
+      }), S.officialOnly);
+      off.title = t("ov.official.tip");
+      off.dataset.fk = "official";
+      status.append(off);
+    }
     const lim = btn("link-btn ov-limbtn", t("ov.limsrc"), openDialog);
     lim.setAttribute("aria-haspopup", "dialog");
     lim.dataset.fk = "limits";
