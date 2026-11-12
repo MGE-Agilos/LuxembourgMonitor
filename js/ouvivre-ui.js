@@ -3,7 +3,7 @@ import { KIOSK } from "./config.js";
 import { h } from "./dom.js";
 import { placeName } from "./grmap.js";
 import { getLang, t } from "./i18n.js";
-import { COUNTRIES, HUBS, SIZES, computePlaces, rank, sortValue } from "./ouvivre.js";
+import { COUNTRIES, HUBS, SIZES, computePlaces, rank, referenceHourlyWage, sortValue } from "./ouvivre.js";
 
 const PAGE = 10;
 const TOP = 10;
@@ -26,7 +26,7 @@ const LIMITS_FR = {
     + "avec la surface)",
 };
 
-const fresh = () => ({ hub: null, size: 70, tenure: "rent", sort: "left", countries: new Set(COUNTRIES), selected: null, shown: PAGE });
+const fresh = () => ({ hub: null, size: 70, tenure: "rent", sort: "left", timeValue: 0, countries: new Set(COUNTRIES), selected: null, shown: PAGE });
 let S = fresh();
 export function resetOuvivre() { S = fresh(); }
 export const ouvivreState = () => S;
@@ -63,6 +63,51 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     draw();
   }
 
+  // ---- "what is 1 hour of your time worth?" slider: built once, never replaced, so a drag survives redraws
+  const refWage = referenceHourlyWage(ov);
+  const SLIDER_MAX = 40;
+  const timeRow = h("div", "ov-time");
+  const timeHead = h("p", "ov-label ov-time-head");
+  const timeVal = h("span", "ov-time-val");
+  const timeTipBtn = btn("ov-i ov-time-tip", "?", () => { timeTip.hidden = !timeTip.hidden; timeTipBtn.setAttribute("aria-expanded", String(!timeTip.hidden)); });
+  const timeTip = h("p", "ov-src ov-time-tipbox", t("ov.time.tip"));
+  const slider = h("input", "ov-slider");
+  const timeRef = h("p", "ov-time-ref");
+  let timer = null;
+  function buildSlider() {
+    timeHead.replaceChildren(h("span", null, t("ov.time.q")), timeVal, timeTipBtn);
+    timeTipBtn.setAttribute("aria-label", t("ov.time.q"));
+    timeTipBtn.setAttribute("aria-expanded", "false");
+    timeTip.hidden = true;
+    timeTipBtn.title = t("ov.time.tip");
+    slider.type = "range";
+    slider.min = "0";
+    slider.max = String(SLIDER_MAX);
+    slider.step = "1";
+    slider.value = String(S.timeValue);
+    slider.setAttribute("aria-label", t("ov.time.q"));
+    slider.oninput = () => {
+      S.timeValue = Number(slider.value);
+      showTimeValue();
+      clearTimeout(timer);
+      timer = setTimeout(() => { onChange?.(); draw(); }, 100);
+    };
+    const track = h("div", "ov-slider-wrap");
+    track.append(slider);
+    if (refWage !== null && refWage <= SLIDER_MAX) {
+      const tick = h("i", "ov-tick");
+      tick.style.setProperty("--p", String(refWage / SLIDER_MAX));
+      tick.setAttribute("aria-hidden", "true");
+      track.append(tick);
+      timeRef.textContent = t("ov.time.ref", { w: num(refWage, lang, 1) });
+      timeRef.style.setProperty("--p", String(refWage / SLIDER_MAX));
+    }
+    timeRow.replaceChildren(timeHead, timeTip, track, timeRef);
+    showTimeValue();
+  }
+  function showTimeValue() { timeVal.textContent = t("ov.time.val", { v: S.timeValue }); }
+  buildSlider();
+
   // ---- lead: question and the two choices
   function drawLead() {
     const hubs = h("div", "ov-opts");
@@ -78,12 +123,17 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     ten.setAttribute("aria-label", `${t("ten.rent")} / ${t("ten.buy")}`);
     for (const k of ["rent", "buy"]) ten.append(pressed(btn("", t(`ten.${k}`), () => changed({ tenure: k })), S.tenure === k));
     sizes.append(ten);
-    lead.replaceChildren(
+    slider.disabled = S.tenure === "buy";
+    timeRow.classList.toggle("is-off", slider.disabled);
+    // keep the slider node in place (do not detach it mid-drag): swap only the other children
+    for (const c of [...lead.children]) if (c !== timeRow) c.remove();
+    lead.prepend(
       h("p", "eyebrow", t("eyebrow")),
       h("h1", "ov-q", t("ov.q")),
       h("p", "ov-label", t("ov.hub")), hubs,
       h("p", "ov-label", t("ov.situation")), sizes,
     );
+    if (timeRow.parentNode !== lead) lead.append(timeRow);
   }
 
   // ---- one number of a card, with its source on tap
@@ -157,7 +207,9 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
         t("s.hours", { h: num(p.hours_month_car, lang, 0) })], [commuteSrc]));
     if (S.tenure === "rent") {
       nums.append(figure(el, t("k.left"), p.left_month === null ? null : eur(p.left_month, lang),
-        [p.left_month === null ? null : t("s.left"), p.left_month === null || p.hours_month_car === null ? null : t("s.hours", { h: num(p.hours_month_car, lang, 0) })],
+        [p.left_month === null ? null : t("s.left"), p.left_month === null || p.hours_month_car === null ? null : t("s.hours", { h: num(p.hours_month_car, lang, 0) }),
+          p.time_cost_month === null ? null : t("s.time", { c: eur(p.time_cost_month, lang), h: num(p.time_hours_month, lang, 0), v: S.timeValue }),
+          p.time_cost_month === null || p.balance_month === null ? null : t("s.balance", { b: eur(p.balance_month, lang) })],
         [p.left_month === null ? null : housingSrc, p.left_month === null ? null : sal, p.left_month === null ? null : fuelSrc]));
     } else {
       const f = figure(el, t("k.left"), "—", [t("s.left_buy")], []);
@@ -200,7 +252,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
   let current = [];
   function computeRanked() {
     const by = effectiveSort();
-    const places = computePlaces(ov, { hub: S.hub, size_m2: S.size, tenure: S.tenure });
+    const places = computePlaces(ov, { hub: S.hub, size_m2: S.size, tenure: S.tenure, timeValue: S.timeValue });
     const ranked = rank(places.filter((p) => S.countries.has(p.country)), by);
     return { by, places, ranked };
   }
@@ -261,7 +313,8 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     seg.setAttribute("role", "group");
     seg.setAttribute("aria-label", t("ov.sort"));
     for (const k of ["left", "time", "housing"]) {
-      const label = k === "housing" && S.tenure === "buy" ? t("sort.housing_buy") : t(`sort.${k}`);
+      const label = k === "housing" && S.tenure === "buy" ? t("sort.housing_buy")
+        : k === "left" && S.timeValue > 0 && S.tenure === "rent" ? t("sort.balance") : t(`sort.${k}`);
       const b = pressed(btn("", label, () => changed({ sort: k, shown: PAGE })), by === k);
       if (k === "left" && S.tenure === "buy") b.disabled = true;
       seg.append(b);

@@ -21,7 +21,16 @@ export function fuelCostMonth(km, days, consumptionL100, pricePerL) {
   return (2 * km * days * (consumptionL100 / 100) * pricePerL) / 12;
 }
 
-export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = "rent" } = {}) {
+// Reference hourly net wage = LU net monthly reference / (40 h x 52 weeks / 12 months); null without the reference.
+export function referenceHourlyWage(data) {
+  const net = num(data?.reference?.net_monthly_lu);
+  return net === null ? null : net / ((40 * 52) / 12);
+}
+
+// timeValue (EUR per hour, default 0) prices the commute: time_cost_month = hours/month x timeValue, with the car hours
+// (mode "car") or the transit p50 hours (mode "transit"); balance_month = left_month - time_cost_month (null if either is).
+export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = "rent", timeValue = 0, mode = "car" } = {}) {
+  const tv = num(timeValue) !== null && timeValue > 0 ? timeValue : 0;
   const net = num(data?.reference?.net_monthly_lu);
   const A = data?.assumptions || {};
   const days = num(A.commute_days_per_year) ?? 220;
@@ -72,6 +81,10 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       else left_month = Math.round(net - rent_month - fuel_cost_month);
     } else if (tenure === "buy") notes.push("left_rent_only");
 
+    const time_hours_month = mode === "transit" ? hoursPerMonth(transit_min, days) : hoursPerMonth(car_min, days);
+    const time_cost_month = tv > 0 && time_hours_month !== null ? Math.round(time_hours_month * tv) : null;
+    const balance_month = left_month === null || (tv > 0 && time_cost_month === null) ? null : left_month - (time_cost_month ?? 0);
+
     return {
       id: p.id,
       lau: p.lau ?? null,
@@ -100,6 +113,10 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       hours_month_transit_p80: hoursPerMonth(transit_p80, days),
       fuel_cost_month,
       left_month,
+      time_value: tv,
+      time_hours_month,
+      time_cost_month,
+      balance_month,
       src: p.src || {},
       notes,
     };
@@ -109,7 +126,10 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
 // Sort keys: "left" (left to live, high first), "time" (car minutes, then transit, short first),
 // "housing" (rent or purchase price, low first). Missing values always go last; ties by name.
 export function sortValue(p, by) {
-  if (by === "left") return p.left_month === null ? null : -p.left_month;
+  if (by === "left") {
+    const v = p.time_value > 0 ? p.balance_month : p.left_month;
+    return v === null ? null : -v;
+  }
   if (by === "time") return p.car_min ?? p.transit_min;
   if (by === "housing") return p.rent_month ?? p.price_total;
   throw new Error(`unknown sort: ${by}`);

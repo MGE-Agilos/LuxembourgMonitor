@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { comparisons, computePlaces, fuelCostMonth, hoursPerMonth, rank } from "./ouvivre.js";
+import { comparisons, computePlaces, fuelCostMonth, hoursPerMonth, rank, referenceHourlyWage } from "./ouvivre.js";
 
 const fixture = {
   reference: { net_monthly_lu: 4000 },
@@ -96,6 +96,45 @@ test("rank puts nulls last and sorts by the chosen key", () => {
   assert.deepEqual(rank(ps, "time").map((p) => p.id), ["lu:0304", "lu:0101", "fr:1", "de:1", "fr:2", "be:1"]);
   assert.deepEqual(rank(ps, "housing").map((p) => p.id), ["fr:2", "fr:1", "lu:0101", "lu:0304", "be:1", "de:1"]);
   assert.throws(() => rank(ps, "nope"));
+});
+
+test("timeValue 0 leaves the ranking and the figures unchanged", () => {
+  const a = computePlaces(fixture, { hub: "kirchberg", size_m2: 70 });
+  const b = computePlaces(fixture, { hub: "kirchberg", size_m2: 70, timeValue: 0 });
+  assert.deepEqual(rank(b, "left").map((p) => p.id), rank(a, "left").map((p) => p.id));
+  for (const p of b) { assert.equal(p.time_cost_month, null); assert.equal(p.balance_month, p.left_month); }
+});
+
+test("a positive time value penalises long commutes", () => {
+  const ps = computePlaces(fixture, { hub: "kirchberg", size_m2: 70, timeValue: 40 });
+  const thi = ps.find((p) => p.id === "fr:1"), lux = ps.find((p) => p.id === "lu:0304");
+  assert.equal(thi.time_cost_month, Math.round(hoursPerMonth(39) * 40));
+  assert.equal(thi.balance_month, thi.left_month - thi.time_cost_month);
+  assert.equal(lux.balance_month, lux.left_month - lux.time_cost_month);
+  // a far cheap place beats a near dear one at 0 EUR/h, and loses once the extra hours are priced
+  const fx = { ...fixture, places: [
+    { id: "near", country: "LU", name: "Near", residents_employed: 1, rent_m2: 20, commute: { kirchberg: { driving: 10, driving_km: 8 } } },
+    { id: "far", country: "FR", name: "Far", lu_workers: 1, rent_m2: 18, commute: { kirchberg: { driving: 60, driving_km: 8 } } },
+  ] };
+  const at = (v) => rank(computePlaces(fx, { hub: "kirchberg", size_m2: 70, timeValue: v }), "left").map((p) => p.id);
+  assert.deepEqual(at(0), ["far", "near"]);
+  assert.deepEqual(at(40), ["near", "far"]);
+});
+
+test("time value nulls: no hours or no left to live gives no balance", () => {
+  const ps = computePlaces(fixture, { hub: "kirchberg", size_m2: 70, timeValue: 20 });
+  for (const id of ["fr:2", "de:1", "be:1"]) assert.equal(ps.find((p) => p.id === id).balance_month, null);
+  assert.deepEqual(rank(ps, "left").slice(-3).map((p) => p.id).sort(), ["be:1", "de:1", "fr:2"]);
+});
+
+test("transit mode uses the transit p50 hours", () => {
+  const thi = computePlaces(fixture, { hub: "kirchberg", size_m2: 70, timeValue: 10, mode: "transit" }).find((p) => p.id === "fr:1");
+  assert.equal(thi.time_cost_month, Math.round(hoursPerMonth(85) * 10));
+});
+
+test("reference hourly wage = net monthly / (40 x 52 / 12)", () => {
+  assert.ok(Math.abs(referenceHourlyWage(fixture) - 4000 / (40 * 52 / 12)) < 1e-9);
+  assert.equal(referenceHourlyWage({}), null);
 });
 
 test("comparisons with Luxembourg City are computed from the data", () => {
