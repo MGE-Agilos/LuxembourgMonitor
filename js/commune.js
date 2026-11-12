@@ -17,7 +17,7 @@ function tile(c, id, lang) {
   } else if (!v && id === "appt_price_m2") {
     sub.textContent = t("fewads");
   } else if (v && c.ranks[id]) {
-    sub.textContent = `${t("rank", { r: c.ranks[id], n: data().meta.counts[id] })} · ${v.y}`;
+    sub.textContent = `${t(c.ranks[id] === 1 ? "rank1" : "rank", { r: c.ranks[id], n: data().meta.counts[id] })} · ${v.y}`;
   }
   card.append(sub);
   return card;
