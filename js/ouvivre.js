@@ -2,7 +2,8 @@
 // Formulas (plan B1): monthly rent = rent_m2 × size; purchase = sale_price_m2 × size;
 // share of the Luxembourg reference net salary; hours/month = 2 × minutes × days / 12 / 60;
 // fuel cost/month = 2 × road km × working days / 12 × consumption / 100 × pump price (assumptions);
-// left to live (rent) = net LU − rent − fuel cost; null when the place has no car route (no number invented).
+// monthly mortgage payment = loan × r / (1 − (1 + r)^−n), loan = loan share × price, r = country rate / 12 (ECB);
+// left to live = net LU − rent (or mortgage payment) − fuel cost; null when the place has no car route (no number invented).
 // Cross-border transit fares are not collected: noted, never counted. No rent-by-size source exists: no size factor.
 
 export const HUBS = ["kirchberg", "lux-gare", "cloche-dor", "belval", "findel"];
@@ -21,6 +22,15 @@ export function fuelCostMonth(km, days, consumptionL100, pricePerL) {
   return (2 * km * days * (consumptionL100 / 100) * pricePerL) / 12;
 }
 
+// Annuity payment per month; null when an input is missing. ratePct in % per year.
+export function mortgagePayment(price, ratePct, years, loanShare) {
+  if (num(price) === null || num(ratePct) === null || num(years) === null || num(loanShare) === null || years <= 0) return null;
+  const loan = price * loanShare;
+  const n = years * 12;
+  const r = ratePct / 100 / 12;
+  return r === 0 ? loan / n : (loan * r) / (1 - (1 + r) ** -n);
+}
+
 // Reference hourly net wage = LU net monthly reference / (40 h x 52 weeks / 12 months); null without the reference.
 export function referenceHourlyWage(data) {
   const net = num(data?.reference?.net_monthly_lu);
@@ -37,6 +47,9 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
   const workDays = num(A.working_days_per_year) ?? days;
   const consumption = num(A.consumption_l_per_100km);
   const fuelPrice = num(A.fuel_price_eur_per_l);
+  const rates = A.mortgage_rate_pct || {};
+  const years = num(A.mortgage_years);
+  const loanShare = num(A.mortgage_loan_share);
   return (data?.places || []).map((p) => {
     const notes = [];
     const rentM2 = num(p.rent_m2);
@@ -74,21 +87,24 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
     else if (transit_min === null) notes.push("transit_not_published");
 
     const housing = tenure === "rent" ? rent_month : price_total;
+    // Buying: the price becomes a monthly mortgage payment at the average rate of the place's country (ECB).
+    const payment = tenure === "buy" && price_total !== null ? mortgagePayment(price_total, num(rates[p.country]), years, loanShare) : null;
+    const mortgage_month = payment === null ? null : Math.round(payment);
+    if (tenure === "buy" && price_total !== null && mortgage_month === null) notes.push("no_mortgage_rate");
+    const monthly = tenure === "rent" ? rent_month : mortgage_month;
     let share_of_lu_net = null;
     let years_of_lu_net = null;
-    if (net !== null && housing !== null) {
-      if (tenure === "rent") share_of_lu_net = rent_month / net;
-      else years_of_lu_net = price_total / (net * 12);
-    }
+    if (net !== null && monthly !== null) share_of_lu_net = monthly / net;
+    if (net !== null && tenure === "buy" && price_total !== null) years_of_lu_net = price_total / (net * 12);
     const fuel_cost_month = fuelCostMonth(car_km, workDays, consumption, fuelPrice);
     if (c && p.country !== "LU") notes.push("transit_cost_not_counted");
 
-    // Left to live is only defined for renting: a purchase has no monthly cost without a mortgage assumption.
+    // Left to live: net LU reference minus the monthly housing cost (rent, or mortgage payment) and fuel.
     let left_month = null;
-    if (tenure === "rent" && net !== null && rent_month !== null) {
+    if (net !== null && monthly !== null) {
       if (fuel_cost_month === null) notes.push("no_car_route");
-      else left_month = Math.round(net - rent_month - fuel_cost_month);
-    } else if (tenure === "buy") notes.push("left_rent_only");
+      else left_month = Math.round(net - monthly - fuel_cost_month);
+    }
 
     const time_hours_month = mode === "transit" ? hoursPerMonth(transit_min, days) : hoursPerMonth(car_min, days);
     const time_cost_month = tv > 0 && time_hours_month !== null ? Math.round(time_hours_month * tv) : null;
@@ -117,6 +133,8 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       appt_price_median: num(p.appt_price_median),
       rent_month,
       price_total,
+      mortgage_month,
+      mortgage_rate_pct: tenure === "buy" ? num(rates[p.country]) : null,
       share_of_lu_net,
       years_of_lu_net,
       car_min,

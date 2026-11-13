@@ -38,7 +38,7 @@ const LIMITS_FR = {
 const fresh = () => ({
   // Kirchberg (the largest business district) is shown by default so the map carries the ranking from the start;
   // `touched` tells whether the visitor has interacted (kiosk attract mode runs until then).
-  hub: "kirchberg", touched: false, size: 70, tenure: "rent", sort: "left", timeValue: 0, countries: new Set(COUNTRIES), selected: null, shown: PAGE,
+  hub: "kirchberg", touched: false, size: 70, tenure: "rent", sort: "left", timeValue: null, countries: new Set(COUNTRIES), selected: null, shown: PAGE,
   tab: "rank", cmp: [], detail: null, colSrc: null, ctrlOpen: true, officialOnly: officialOnly(),
 });
 let S = fresh();
@@ -56,7 +56,7 @@ export const ouvivreState = () => S;
 // Context of the "Ask the data" bubble: the visitor's situation on this page (no hub = nothing chosen yet).
 export function ouvivreContext() {
   if (!S.hub) return {};
-  const ctx = { hub: S.hub, size_m2: S.size, tenure: S.tenure, time_value: S.tenure === "rent" ? S.timeValue : 0 };
+  const ctx = { hub: S.hub, size_m2: S.size, tenure: S.tenure, time_value: S.timeValue ?? 0 };
   if (S.selected) ctx.place = S.selected;
   return ctx;
 }
@@ -109,7 +109,7 @@ let escHandler = null;
 // capture phase: runs before the chat bubble closes itself, so one Esc never closes both
 addEventListener("keydown", (e) => { if (e.key === "Escape" && escHandler?.()) e.preventDefault(); }, { capture: true });
 
-export function effectiveSort() { return S.tenure === "buy" && S.sort === "left" ? "housing" : S.sort; }
+export function effectiveSort() { return S.sort; }
 
 export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onChange, onAsk, go = (hash) => { location.hash = hash; } }) {
   const lang = getLang();
@@ -131,6 +131,8 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
   // ---- "what is 1 hour of your time worth?" slider: built once, never replaced, so a drag survives redraws
   const refWage = referenceHourlyWage(ov);
   const SLIDER_MAX = 40;
+  // the slider starts on the reference wage, so the commute time counts from the first ranking
+  if (S.timeValue === null) S.timeValue = refWage === null ? 0 : Math.min(SLIDER_MAX, Math.round(refWage));
   const timeRow = h("div", "ov-time");
   const timeLabel = h("span", "ov-glabel");
   const timeVal = h("span", "ov-time-val");
@@ -184,7 +186,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
   buildSlider();
 
   // ---- lead: question + one compact controls bar (hub, size, rent/buy, time value)
-  const summary = () => (S.hub ? `${t(`hub.${S.hub}`)} · ${S.size} m² · ${t(`ten.${S.tenure}`)}${S.tenure === "rent" && S.timeValue ? ` · ${t("ov.time.val", { v: S.timeValue })}` : ""}` : t("ov.hub"));
+  const summary = () => (S.hub ? `${t(`hub.${S.hub}`)} · ${S.size} m² · ${t(`ten.${S.tenure}`)}${S.timeValue ? ` · ${t("ov.time.val", { v: S.timeValue })}` : ""}` : t("ov.hub"));
   function group(label, cls, items) {
     const g = h("div", `ov-opts ${cls}`);
     g.setAttribute("role", "group");
@@ -207,8 +209,6 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const ten = group(`${t("ten.rent")} / ${t("ten.buy")}`, "ov-ten", ["rent", "buy"].map((k) => ({
       text: t(`ten.${k}`), on: S.tenure === k, fk: `ten:${k}`, onClick: () => changed({ tenure: k }),
     })));
-    slider.disabled = S.tenure === "buy";
-    timeRow.classList.toggle("is-off", slider.disabled);
 
     const gHub = h("div", "ov-grp ov-grp-hub");
     gHub.append(h("span", "ov-glabel", t("ov.hub")), hubs);
@@ -265,6 +265,12 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     return box;
   }
 
+  // Source line of the mortgage payment: rate of the place's country, duration and loan share (assumptions).
+  function mortSrc(p) {
+    if (p.mortgage_rate_pct === null || p.mortgage_rate_pct === undefined) return null;
+    return { name: `${t("d.mortgage", { r: num(p.mortgage_rate_pct, lang, 2), c: p.country, y: A.mortgage_years,
+      s: pct(A.mortgage_loan_share, lang), m: A.mortgage_rate_period })} — ${srcName(A.mortgage_rate_source)}`, url: srcUrl(A.mortgage_rate_source) };
+  }
   function figures(host, p, { compact }) {
     const estE = S.tenure === "rent" ? (p.rent_estimated ? p.rent_est : null) : (p.price_estimated ? p.sale_est : null);
     const estNote = estE ? estText(p, S.tenure === "rent" ? "rent" : "price") : null;
@@ -280,24 +286,25 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
         [p.share_of_lu_net === null ? null : t("s.share", { p: pct(p.share_of_lu_net, lang) })], [housingSrc, p.share_of_lu_net === null ? null : sal], estNote));
     } else {
       nums.append(figure(host, t("k.price"), p.price_total === null ? null : eurBig(p.price_total, lang),
-        [p.years_of_lu_net === null ? null : t("s.years", { y: num(p.years_of_lu_net, lang, 1) })], [housingSrc, p.years_of_lu_net === null ? null : sal], estNote));
+        [p.mortgage_month === null ? null : t("s.mortgage", { m: eur(p.mortgage_month, lang), p: pct(p.share_of_lu_net, lang) }),
+          p.years_of_lu_net === null || compact ? null : t("s.years", { y: num(p.years_of_lu_net, lang, 1) })],
+        [housingSrc, p.mortgage_month === null ? null : mortSrc(p), p.years_of_lu_net === null ? null : sal], estNote));
     }
     nums.append(figure(host, t("k.time"), p.car_min === null ? null : `${p.car_min} min`, p.car_min === null
       ? [p.dist_lux_km === null ? null : t("s.dist", { km: num(p.dist_lux_km, lang, 0) })]
       : [p.transit_min === null ? t("s.transit_none") : t("s.transit", { m: p.transit_min, p: p.transit_p80 ?? "–" }),
         compact ? null : t("s.hours", { h: num(p.hours_month_car, lang, 0) })], [commuteSrc]));
-    if (S.tenure === "rent") {
+    {
       const timed = p.time_cost_month !== null;
       // compact (phone card, drawer) with a time value: the balance is the headline, the time cost its sub-line
       const bal = compact && timed && p.balance_month !== null;
       nums.append(figure(host, bal ? t("sort.balance") : t("k.left"), bal ? eur(p.balance_month, lang) : p.left_month === null ? null : eur(p.left_month, lang),
-        [p.left_month === null || compact ? null : t("s.left"),
+        [p.left_month === null || compact ? null : t(S.tenure === "rent" ? "s.left" : "s.left_buy2"),
           compact || p.left_month === null || p.hours_month_car === null ? null : t("s.hours", { h: num(p.hours_month_car, lang, 0) }),
           !timed ? null : t("s.time", { c: eur(p.time_cost_month, lang), h: num(p.time_hours_month, lang, 0), v: S.timeValue }),
           !timed || compact || p.balance_month === null ? null : t("s.balance", { b: eur(p.balance_month, lang) })],
-        [p.left_month === null ? null : housingSrc, p.left_month === null ? null : sal, p.left_month === null ? null : fuelSrc], p.left_month === null ? null : estNote));
-    } else {
-      nums.append(figure(host, t("k.left"), "—", [t("s.left_buy")], []));
+        [p.left_month === null ? null : housingSrc, p.left_month === null || S.tenure === "rent" ? null : mortSrc(p),
+          p.left_month === null ? null : sal, p.left_month === null ? null : fuelSrc], p.left_month === null ? null : estNote));
     }
     return nums;
   }
@@ -395,7 +402,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
 
   function columns(ranked) {
     const rent = S.tenure === "rent";
-    const tv = rent && S.timeValue > 0;
+    const tv = S.timeValue > 0;
     const pick = (key) => uniqSrc(ranked.map((p) => srcOf(p.src?.[key])));
     const estIds = ranked.filter((p) => (rent ? p.rent_estimated : p.price_estimated)).flatMap((p) => (rent ? p.rent_est : p.sale_est)?.source_ids || []);
     const housingS = uniqSrc([...pick(rent ? "rent_m2" : "sale_price_m2"), ...[...new Set(estIds)].map(srcOf)]);
@@ -406,18 +413,21 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
       { k: "housing", label: rent ? t("k.rent") : t("k.price"), sort: "housing", src: housingS,
         est: (p) => (rent ? p.rent_estimated : p.price_estimated),
         v: (p) => (rent ? (p.rent_month === null ? null : eur(p.rent_month, lang)) : (p.price_total === null ? null : eurBig(p.price_total, lang))) },
-      { k: "share", label: rent ? t("col.share") : t("col.years"), sort: "housing", src: uniqSrc([...housingS, ...salS]),
-        est: (p) => (rent ? p.rent_estimated : p.price_estimated),
-        v: (p) => (rent ? (p.share_of_lu_net === null ? null : pct(p.share_of_lu_net, lang)) : (p.years_of_lu_net === null ? null : num(p.years_of_lu_net, lang, 1))) },
+      rent
+        ? { k: "share", label: t("col.share"), sort: "housing", src: uniqSrc([...housingS, ...salS]), est: (p) => p.rent_estimated,
+          v: (p) => (p.share_of_lu_net === null ? null : pct(p.share_of_lu_net, lang)) }
+        : { k: "mortgage", label: t("col.mortgage"), sub: t("col.share"), sort: "housing",
+          src: uniqSrc([...housingS, ...(A.mortgage_rate_source ? [srcOf(A.mortgage_rate_source)] : []), ...salS]), est: (p) => p.price_estimated,
+          v: (p) => (p.mortgage_month === null ? null : [eur(p.mortgage_month, lang), pct(p.share_of_lu_net, lang)]) },
       { k: "car", label: t("col.car"), sort: "time", src: commuteS, v: (p) => (p.car_min === null ? null : t("ov.min", { m: p.car_min })) },
       { k: "tc", label: t("col.tc"), sub: t("col.tc80"), src: commuteS,
         v: (p) => (p.transit_min === null ? null : [t("ov.min", { m: p.transit_min }), p.transit_p80 ?? null]) },
       { k: "hours", label: t("col.hours"), sort: "time", src: commuteS,
         v: (p) => (p.hours_month_car === null ? null : t("ov.h", { h: num(p.hours_month_car, lang, 0) })) },
     ];
-    if (rent) {
+    {
       cols.push({ k: "left", label: tv ? t("sort.balance") : t("k.left"), sort: "left", src: uniqSrc([...housingS, ...salS, ...fuelS]),
-        est: (p) => p.rent_estimated,
+        est: (p) => (rent ? p.rent_estimated : p.price_estimated),
         v: (p) => { const x = tv ? p.balance_month : p.left_month; return x === null ? null : eur(x, lang); },
         title: (p) => (tv && p.time_cost_month !== null && p.left_month !== null
           ? `${t("k.left")} ${eur(p.left_month, lang)} · ${t("s.time", { c: eur(p.time_cost_month, lang), h: num(p.time_hours_month, lang, 0), v: S.timeValue })}`
@@ -775,10 +785,9 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     seg.setAttribute("aria-label", t("ov.sort"));
     for (const k of ["left", "time", "housing"]) {
       const label = k === "housing" && S.tenure === "buy" ? t("sort.housing_buy")
-        : k === "left" && S.timeValue > 0 && S.tenure === "rent" ? t("sort.balance") : t(`sort.${k}`);
+        : k === "left" && S.timeValue > 0 ? t("sort.balance") : t(`sort.${k}`);
       const b = pressed(btn("", label, () => changed({ sort: k, shown: PAGE })), by === k);
       b.dataset.fk = `psort:${k}`;
-      if (k === "left" && S.tenure === "buy") b.disabled = true;
       seg.append(b);
     }
     sortRow.append(seg, chipsBar());

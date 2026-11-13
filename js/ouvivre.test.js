@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
-import { comparisons, computePlaces, fuelCostMonth, hoursPerMonth, rank, referenceHourlyWage } from "./ouvivre.js";
+import { comparisons, computePlaces, fuelCostMonth, hoursPerMonth, mortgagePayment, rank, referenceHourlyWage } from "./ouvivre.js";
 
 const fixture = {
   reference: { net_monthly_lu: 4000 },
@@ -78,16 +78,33 @@ test("missing data gives null and a note, never a number", () => {
   assert.ok(beck.notes.includes("transit_not_published"));
 });
 
-test("buy: price total and years of net salary, no left to live", () => {
-  const ps = computePlaces(fixture, { hub: "kirchberg", size_m2: 90, tenure: "buy" });
+test("mortgagePayment is the standard annuity", () => {
+  // 200 000 € borrowed over 25 years at 3.6 %: about 1 012 € per month
+  assert.ok(Math.abs(mortgagePayment(250000, 3.6, 25, 0.8) - 1012.0) < 1);
+  assert.equal(mortgagePayment(120000, 0, 10, 1), 1000);
+  assert.equal(mortgagePayment(null, 3, 25, 0.8), null);
+  assert.equal(mortgagePayment(100000, null, 25, 0.8), null);
+});
+
+test("buy: price, mortgage payment, left to live with fuel, time value applies", () => {
+  const data = { ...fixture, assumptions: { ...fixture.assumptions, mortgage_years: 25, mortgage_loan_share: 0.8, mortgage_rate_pct: { LU: 3.6 } } };
+  const ps = computePlaces(data, { hub: "kirchberg", size_m2: 90, tenure: "buy" });
   const lux = ps[0];
   assert.equal(lux.price_total, 900000);
   assert.equal(lux.years_of_lu_net, 900000 / 48000);
-  assert.equal(lux.share_of_lu_net, null);
+  assert.equal(lux.mortgage_month, Math.round(mortgagePayment(900000, 3.6, 25, 0.8)));
+  assert.equal(lux.share_of_lu_net, lux.mortgage_month / 4000);
   assert.equal(lux.rent_month, null); // buy mode: no rent mixed into the housing sort
+  assert.equal(lux.left_month, Math.round(4000 - lux.mortgage_month - fuelCostMonth(4, 220, 6.5, 1.8)));
   assert.deepEqual(rank(ps, "housing").slice(0, 1).map((p) => p.id), ["lu:0304"]);
-  assert.equal(lux.left_month, null);
   assert.ok(ps.find((p) => p.id === "be:1").notes.includes("price_median_only"));
+  const tv = computePlaces(data, { hub: "kirchberg", size_m2: 90, tenure: "buy", timeValue: 20 })[0];
+  assert.equal(tv.balance_month, tv.left_month - Math.round(hoursPerMonth(12) * 20));
+  // without a rate for the country: no payment, no left to live, a note (never a guessed rate)
+  const noRate = computePlaces(fixture, { hub: "kirchberg", size_m2: 90, tenure: "buy" })[0];
+  assert.equal(noRate.mortgage_month, null);
+  assert.equal(noRate.left_month, null);
+  assert.ok(noRate.notes.includes("no_mortgage_rate"));
 });
 
 test("rank puts nulls last and sorts by the chosen key", () => {
