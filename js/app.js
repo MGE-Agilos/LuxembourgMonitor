@@ -1,9 +1,10 @@
 import { createAttract } from "./attract.js";
 import { createChat } from "./assistant.js";
 import { TABS, renderCommune } from "./commune.js";
-import { FACT_MS, IDLE_MS, KIOSK, VIDEO } from "./config.js";
+import { FACT_MS, IDLE_MS, KIOSK, VIDEO, VISIT_URL } from "./config.js";
 import { displayName, findCommune, loadData } from "./data.js";
 import { h } from "./dom.js";
+import { createGate } from "./gate.js";
 import { createGrMap } from "./grmap.js";
 import { createHelp } from "./help.js";
 import { applyStatic, getLang, setLang, t, tl } from "./i18n.js";
@@ -130,7 +131,7 @@ function tourSeen() {
   try { return localStorage.getItem(TOUR_KEY) === "1"; } catch { return false; }
 }
 function maybeAutoTour() {
-  if (autoTimer || tour.isOpen() || (autoDone && !forceTour)) return;
+  if (autoTimer || tour.isOpen() || (autoDone && !forceTour) || !gate.isAdmitted()) return;
   if (!shouldAutoStart({ kiosk: KIOSK, video: VIDEO, forced: forceTour, seen: tourSeen() })) return;
   autoTimer = setTimeout(() => {
     autoTimer = null;
@@ -239,9 +240,9 @@ function search(exact) {
 document.getElementById("search").addEventListener("submit", (e) => { e.preventDefault(); search(false); });
 input.addEventListener("change", () => search(true)); // datalist pick = exact name only
 
-// Language toggle
-document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => {
-  setLang(b.dataset.lang);
+// Language toggle (header buttons and welcome screen)
+function changeLang(l) {
+  setLang(l);
   applyStatic();
   fillList();
   map.relabel(getLang());
@@ -249,7 +250,11 @@ document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("clic
   help.relabel();
   route();
   tour.relabel();
-}));
+}
+document.querySelectorAll("[data-lang]").forEach((b) => b.addEventListener("click", () => changeLang(b.dataset.lang)));
+
+// Welcome screen: first and last name before entering (logged in Supabase); kiosk: asked again to each visitor.
+const gate = createGate({ url: VISIT_URL, kiosk: KIOSK, video: VIDEO, getLang, setLang: changeLang, onAdmit: () => maybeAutoTour() });
 
 // The nav "Ask" link opens the bubble (its href #/ask still works without JS routing)
 document.getElementById("nav-ask").addEventListener("click", (e) => { e.preventDefault(); chat.open(); });
@@ -263,6 +268,7 @@ if (KIOSK && !VIDEO) {
     if (Date.now() - last <= IDLE_MS) return;
     tour.stop();
     help.close({ restoreFocus: false });
+    gate.relock();
     if (chat.isOpen() || chat.hasThread()) { chat.close({ restoreFocus: false }); chat.reset(); }
     if (!home) { resetOuvivre(); go("#/"); } else if (ouvivreState().touched || !homeAttract.running()) { resetOuvivre(); route(); }
   }, 5000);
@@ -285,5 +291,6 @@ window.LM = {
   tour: (start = true) => (start ? tour.start() : (tour.stop(), false)),
   tourCtl: tour,
   help,
+  gate,
   ready: true,
 };

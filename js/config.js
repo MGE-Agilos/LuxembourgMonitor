@@ -3,6 +3,10 @@ const DEFAULT_ASK_URL = "https://vxwmhsgxoomcbiukeinp.supabase.co/functions/v1/l
 const params = new URLSearchParams(location.search);
 const ask = params.get("ask");
 
+// Welcome-screen log (first and last name): ?visit=<url> points to a local function, ?visit=off disables the log.
+const DEFAULT_VISIT_URL = "https://vxwmhsgxoomcbiukeinp.supabase.co/functions/v1/luxembourg-monitor-visit";
+const visit = params.get("visit");
+export const VISIT_URL = visit === "off" ? "" : (visit || DEFAULT_VISIT_URL);
 export const ASK_URL = ask === "off" ? "" : (ask || DEFAULT_ASK_URL);
 export const KIOSK = params.has("kiosk");
 export const VIDEO = params.has("video");
