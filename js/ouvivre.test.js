@@ -96,8 +96,16 @@ test("buy: price, mortgage payment, left to live with fuel, time value applies",
   assert.equal(lux.share_of_lu_net, lux.mortgage_month / 4000);
   assert.equal(lux.rent_month, null); // buy mode: no rent mixed into the housing sort
   assert.equal(lux.left_month, Math.round(4000 - lux.mortgage_month - fuelCostMonth(4, 220, 6.5, 1.8)));
-  assert.deepEqual(rank(ps, "housing").slice(0, 1).map((p) => p.id), ["lu:0304"]);
-  assert.ok(ps.find((p) => p.id === "be:1").notes.includes("price_median_only"));
+  assert.deepEqual(rank(ps, "housing").slice(0, 2).map((p) => p.id), ["be:1", "lu:0304"]); // Arlon: median house price
+  const be = ps.find((p) => p.id === "be:1");
+  if (be.price_total === null) assert.ok(be.notes.includes("price_median_only"));
+  else assert.ok(be.notes.includes("price_median_house"));
+  // Belgium: median price per sale (apartment up to 70 m², house at 90 m²), never multiplied by the size
+  const beData = { ...data, places: [{ id: "be:9", country: "BE", name: "B", house_price_median: 300000, appt_price_median: 200000 }] };
+  assert.equal(computePlaces(beData, { size_m2: 70, tenure: "buy" })[0].price_total, 200000);
+  const beHouse = computePlaces(beData, { size_m2: 90, tenure: "buy" })[0];
+  assert.equal(beHouse.price_total, 300000);
+  assert.ok(beHouse.notes.includes("price_median_house"));
   const tv = computePlaces(data, { hub: "kirchberg", size_m2: 90, tenure: "buy", timeValue: 20 })[0];
   assert.equal(tv.balance_month, tv.left_month - Math.round(hoursPerMonth(12) * 20));
   // without a rate for the country: no payment, no left to live, a note (never a guessed rate)

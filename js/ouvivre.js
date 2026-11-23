@@ -7,7 +7,7 @@
 // Cross-border transit fares are not collected: noted, never counted. No rent-by-size source exists: no size factor.
 
 export const HUBS = ["kirchberg", "lux-gare", "cloche-dor", "belval", "findel", "mamer", "esch", "mersch", "wiltz", "remich"];
-export const SIZES = [50, 70, 90];
+export const SIZES = [50, 70, 90, 120, 150];
 export const COUNTRIES = ["LU", "FR", "DE", "BE"];
 // Hubs whose commute times are our own computation (scripts/extra_hubs.py), not the third-party ChatHome model.
 export const EXTRA_HUBS = ["mamer", "esch", "mersch", "wiltz", "remich"];
@@ -67,7 +67,10 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
     const rentUsed = rentM2 ?? rentEst;
     const saleUsed = saleM2 ?? saleEst;
     const rent_month = tenure !== "rent" || rentUsed === null ? null : Math.round(rentUsed * size_m2);
-    const price_total = tenure !== "buy" || saleUsed === null ? null : Math.round(saleUsed * size_m2);
+    // Belgium (Statbel) publishes a median price per sale, not per m²: a typical apartment for 50-70 m², a house from 90 m².
+    const beKind = p.country === "BE" && saleUsed === null ? (size_m2 >= 90 ? "house" : "appt") : null;
+    const beMedian = beKind ? num(beKind === "house" ? p.house_price_median : p.appt_price_median) : null;
+    const price_total = tenure !== "buy" ? null : saleUsed !== null ? Math.round(saleUsed * size_m2) : beMedian;
     const c = p.commute?.[hub] || null;
     const car_min = num(c?.driving);
     const car_km = num(c?.driving_km);
@@ -84,6 +87,7 @@ export function computePlaces(data, { hub = "kirchberg", size_m2 = 70, tenure = 
       else notes.push("price_not_published");
     }
     if (tenure === "rent" && rent_estimated) notes.push(`rent_estimate_${p.rent_est?.method || "unknown"}`);
+    if (tenure === "buy" && beMedian !== null) notes.push(`price_median_${beKind}`);
     if (tenure === "buy" && price_estimated) notes.push(`price_estimate_${p.sale_est?.method || "unknown"}`);
     if (p.country === "FR" && tenure === "rent" && rent_month !== null) notes.push("rent_charges_included", "rent_size_fr");
     if (p.country === "LU" && tenure === "rent" && rent_month !== null && size_m2 > 50) notes.push("rent_size_lu");

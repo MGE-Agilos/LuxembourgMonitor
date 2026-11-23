@@ -23,15 +23,21 @@ const LIMITS_FR = {
     "Modèle de trajet tiers, matin de semaine : il sous-estime les files aux frontières",
   "No sale prices in Moselle (DVF does not cover Alsace-Moselle)":
     "Pas de prix de vente en Moselle (DVF ne couvre pas l'Alsace-Moselle)",
-  "No commute times and no rents for Belgium; German rents not comparable":
-    "Ni temps de trajet ni loyers pour la Belgique ; loyers allemands non comparables",
+  [`No rents for Belgium (none published per commune); Belgian purchase = median price of an apartment (50-70 m2) or a house (from 90 m2), not per m2; Belgian commute times are our own car computation; German rents not comparable`]:
+    "Pas de loyers pour la Belgique (aucun n'est publié par commune) ; achat en Belgique = prix médian d'un appartement "
+    + "(50-70 m²) ou d'une maison (dès 90 m²), pas au m² ; temps de trajet belges calculés par nous, en voiture ; "
+    + "loyers allemands non comparables",
+  [`Mamer, Esch-sur-Alzette, Mersch, Wiltz and Remich hubs: own computation from the main station (car: OSRM free flow x peak factor calibrated on ChatHome; transit: official Luxembourg GTFS, which lacks French and German urban buses, and whose 'bad day' is timetable spread only)`]:
+    "Pôles Mamer, Esch-sur-Alzette, Mersch, Wiltz et Remich : calcul maison depuis la gare principale (voiture : OSRM "
+    + "à vide × facteur de pointe calé sur ChatHome ; transports : horaires officiels luxembourgeois, sans les bus "
+    + "urbains français et allemands, et dont le « mauvais jour » ne reflète que l'écart des horaires)",
   "Belgian prices are medians per sale (not per m2)": "Prix belges : médianes par vente (pas au m²)",
   [`Commute cost = fuel only (monthly average pump price, 6.5 L/100 km, 220 days); cross-border transit fares, parking and car wear are not counted`]:
     "Coût du trajet = carburant seulement (prix moyen mensuel à la pompe, 6,5 L/100 km, 220 jours) ; titres de transport "
     + "transfrontaliers, parking et usure de la voiture non comptés",
-  [`Rent per m2 is multiplied by the chosen size without size correction: Luxembourg advertised flats average about 42 m2, so rents for 70 and 90 m2 may be overstated (per-m2 rent is usually lower for larger flats)`]:
+  [`Rent per m2 is multiplied by the chosen size without size correction: Luxembourg advertised flats average about 42 m2, so rents for 70 to 150 m2 may be overstated (per-m2 rent is usually lower for larger flats)`]:
     "Le loyer au m² est multiplié par la surface choisie sans correction : les appartements annoncés au Luxembourg font "
-    + "en moyenne environ 42 m², les loyers de 70 et 90 m² peuvent donc être surestimés (le loyer au m² baisse en général "
+    + "en moyenne environ 42 m², les loyers de 70 à 150 m² peuvent donc être surestimés (le loyer au m² baisse en général "
     + "avec la surface)",
 };
 
