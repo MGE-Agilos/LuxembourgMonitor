@@ -47,7 +47,11 @@ export function isValid(res) {
       && (f.label === undefined || (f.label && typeof f.label === "object")))));
 }
 
-export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = ASK_TIMEOUT_MS, signal, history, context } = {}) {
+// Questions per visitor (the server enforces the same limit by visitor id).
+export const MAX_QUESTIONS = 20;
+export class QuotaError extends Error {}
+
+export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = ASK_TIMEOUT_MS, signal, history, context, visitor } = {}) {
   if (!url) throw new Error("offline");
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), timeoutMs);
@@ -59,12 +63,17 @@ export async function askApi(question, lang, lau, { url = ASK_URL, timeoutMs = A
     const body = { question, lang, lau };
     if (history?.length) body.history = history;
     if (context) body.context = context;
+    if (visitor) body.visitor = visitor;
     const r = await fetch(url, {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify(body),
       signal: ctrl.signal,
     });
+    if (r.status === 429) {
+      const e = await r.json().catch(() => ({}));
+      if (e?.error === "quota") throw new QuotaError("quota");
+    }
     if (!r.ok) throw new Error(`http ${r.status}`);
     const j = await r.json();
     if (!isValid(j)) throw new Error("bad response");
@@ -99,7 +108,16 @@ const ICON = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"
  * @param navigate    (hash) => go to a page (the thread stays)
  * @param onOpen      () => called when the panel opens (e.g. stop the attract loop)
  */
-export function createChat({ getContext, highlight = () => {}, navigate, onOpen = () => {} }) {
+// Live questions already asked by this visitor (kept per visitor id in this browser).
+const COUNT_KEY = "lm.ask.count";
+export function readCount(vid) {
+  try { const c = JSON.parse(localStorage.getItem(COUNT_KEY) || "null"); return c && c.vid === vid ? c.n : 0; } catch { return 0; }
+}
+function writeCount(vid, n) {
+  try { localStorage.setItem(COUNT_KEY, JSON.stringify({ vid, n })); } catch { /* storage unavailable */ }
+}
+
+export function createChat({ getContext, highlight = () => {}, navigate, onOpen = () => {}, getVisitor = () => null }) {
   let thread = loadThread();
   let isOpen = false;
   let apiDown = !ASK_URL;
@@ -306,7 +324,7 @@ export function createChat({ getContext, highlight = () => {}, navigate, onOpen 
         p.append(h("span", "lm-dots"), h("span", null, t("ask.thinking")));
         a.append(p);
       } else if (turn.status === "ok") a.append(answerBox(turn.res));
-      else a.append(h("p", "chip warn", turn.status === "needlive" ? t("ask.needlive") : t("ask.offline")));
+      else a.append(h("p", "chip warn", turn.status === "quota" ? t("ask.quota", { n: MAX_QUESTIONS }) : turn.status === "needlive" ? t("ask.needlive") : t("ask.offline")));
       items.push(a);
       if (i === thread.length - 1 && turn.status !== "pending") {
         items.push(h("p", "lm-more-title", t("ask.more")));
@@ -331,13 +349,17 @@ export function createChat({ getContext, highlight = () => {}, navigate, onOpen 
     render();
     const L = lang();
     let res = null;
-    if (!VIDEO) {
+    const vid = getVisitor();
+    let quota = readCount(vid) >= MAX_QUESTIONS;
+    if (!VIDEO && !quota) {
       const ctx = getContext();
       try {
-        res = await askApi(question, L, ctx?.lau || null, { signal: abort.signal, history, context: ctx });
+        res = await askApi(question, L, ctx?.lau || null, { signal: abort.signal, history, context: ctx, visitor: vid });
         apiDown = false;
+        writeCount(vid, readCount(vid) + 1);
       } catch (err) {
-        if (err?.name !== "AbortError" || !abort.signal.aborted) apiDown = true;
+        if (err instanceof QuotaError) { quota = true; writeCount(vid, MAX_QUESTIONS); }
+        else if (err?.name !== "AbortError" || !abort.signal.aborted) apiDown = true;
         res = null;
       }
     }
@@ -348,7 +370,7 @@ export function createChat({ getContext, highlight = () => {}, navigate, onOpen 
       if (VIDEO && res) await sleep(1800);
     }
     if (!thread.includes(turn)) return; // conversation reset meanwhile
-    turn.status = res ? "ok" : suggestionId ? "offline" : "needlive";
+    turn.status = res ? "ok" : quota ? "quota" : suggestionId ? "offline" : "needlive";
     turn.res = res;
     saveThread(thread);
     if (my === seq) {

@@ -75,6 +75,12 @@ export function createGate({ url, kiosk = false, video = false, getLang, setLang
   let disabled = video;
   try { if (ls?.getItem("lm.gate") === "off") disabled = true; } catch { /* ignore */ }
   let admitted = disabled || (!kiosk && ls?.getItem(VISITOR_KEY) === "1");
+  // Anonymous visitor id (sent with each question to cap them at 20 per visitor): kept in the browser on the web,
+  // new for each visitor on the kiosk.
+  const newId = () => (globalThis.crypto?.randomUUID ? crypto.randomUUID() : `${Date.now().toString(16)}-${Math.random().toString(16).slice(2)}`);
+  let vid = null;
+  if (!kiosk) { try { vid = ls?.getItem("lm.vid") || null; } catch { /* ignore */ } }
+  if (!vid) { vid = newId(); if (!kiosk) try { ls?.setItem("lm.vid", vid); } catch { /* ignore */ } }
   let resolveReady;
   const ready = new Promise((r) => { resolveReady = r; });
   if (admitted) resolveReady();
@@ -224,10 +230,12 @@ export function createGate({ url, kiosk = false, video = false, getLang, setLang
     ready,
     isOpen: () => Boolean(dlg?.open),
     isAdmitted: () => admitted,
+    visitorId: () => vid,
     // kiosk idle reset: the next visitor must introduce themselves; a half-filled form is cleared
     relock() {
       if (!kiosk || disabled) return;
       admitted = false;
+      vid = newId();
       if (dlg?.open) dlg.close();
       if (dlg) dlg.innerHTML = "";
     },

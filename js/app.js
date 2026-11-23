@@ -92,6 +92,7 @@ function highlightAnswer(ids) {
 const chat = createChat({
   getContext, highlight: highlightAnswer, navigate: (hash) => go(hash),
   onOpen: () => { attract.stop(); if (homeAttract.running()) { homeAttract.stop(); grmap.clear(); } },
+  getVisitor: () => gate.visitorId(),
 });
 let lastPage = "#/";
 const isHome = () => !location.hash || location.hash === "#/";
