@@ -133,6 +133,8 @@
 .pr-h2 { font: 800 26px/1.15 var(--f-body); margin: 10px 0 0; }
 .pr-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
 .pr-grid.is-compact { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+/* measured traffic jams: long corridor labels, the card takes two columns when the grid has them */
+@media (min-width: 761px) { .pr-grid:not(.is-compact) .pr-card[data-pr="roads"] { grid-column: span 2; } }
 .pr-card { padding: 14px 18px 16px; gap: 6px; min-width: 0; }
 .pr-card .kpi-value { font-size: 30px; }
 .pr-card .kpi-value.pr-word { font-size: 22px; }

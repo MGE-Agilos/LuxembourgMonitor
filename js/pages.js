@@ -177,6 +177,23 @@ export function problems({ compact = false } = {}) {
   }
   grid.append(tr.card);
 
+  // 3b roads: travel times measured on the CITA motorway signs (our own 5-minute log), night vs weekday peak
+  const road = ov.road_delays;
+  if (road?.corridors?.length) {
+    const head = road.corridors.find((c) => c.id === "france>lux-sud") || road.corridors[0];
+    const period = t("pr.roads.period", { a: road.first_day.split("-").reverse().join("/"), b: road.last_day.split("-").reverse().join("/") });
+    const rc = problemCard("roads", t("pr.roads"), t("pr.roads.v", { a: head.p50, b: head.night }),
+      t("pr.roads.s", { road: head.label[lang], p: period, d: head.weekdays }),
+      [{ name: ov.sources.cita?.name || "CITA", url: ov.sources.cita?.url, year: period }]);
+    if (!compact) {
+      const rows = road.corridors.map((c) => ({ label: c.label[lang], v: c.p50,
+        display: t("pr.roads.row", { n: c.night, m: c.p50, b: c.p80 }), emph: c.id === head.id, color: c.when === "pm" ? "var(--mark-2)" : undefined }));
+      hbars(rc.body, rows);
+      rc.body.append(h("p", "pr-sub", t("pr.roads.note")));
+    }
+    grid.append(rc.card);
+  }
+
   // 4 childcare: national figures only (national.json facts, press report of ministry figures)
   const fc = st.national?.facts || {};
   const cp = fc.childcare_places, cp0 = fc.childcare_places_prev, cu = fc.childcare_unoccupied;
