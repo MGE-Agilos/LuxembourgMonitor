@@ -337,7 +337,7 @@ export function sourceList() {
     add({ id, name: s.name, url: s.url, level: id === "statec_crime" ? "national" : "commune", date });
   }
   for (const [id, s] of Object.entries(ov.sources)) {
-    const date = id === "igss_emploi" ? igssDate() : id === "lu_fuel" ? ov.assumptions?.fuel_price_period : null;
+    const date = id === "igss_emploi" ? igssDate() : id === "lu_fuel" ? ov.assumptions?.fuel_price_period : id === "immoweb_sample" ? "2026-11-23" : null;
     add({ id, name: s.name, url: s.url, level: OV_LEVEL[id] || "crossborder", date });
   }
   for (const s of ref.sources || []) add({ id: s.id, name: s.name, url: s.url, level: "country", date: s.id === "eurostat_earn_mw_cur" ? ref.min_wage_period_lu : ref.net_year_lu });
