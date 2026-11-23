@@ -23,8 +23,9 @@ const LIMITS_FR = {
     "Modèle de trajet tiers, matin de semaine : il sous-estime les files aux frontières",
   "No sale prices in Moselle (DVF does not cover Alsace-Moselle)":
     "Pas de prix de vente en Moselle (DVF ne couvre pas l'Alsace-Moselle)",
-  [`No rents for Belgium (none published per commune); Belgian purchase = median price of an apartment (50-70 m2) or a house (from 90 m2), not per m2; Belgian commute times are our own car computation; German rents not comparable`]:
-    "Pas de loyers pour la Belgique (aucun n'est publié par commune) ; achat en Belgique = prix médian d'un appartement "
+  [`No published rents for Belgium: our estimate = median per m2 of 4 to 8 Immoweb rental listings per commune (read 23/11/2026, rent excluding charges); Belgian purchase = median price of an apartment (50-70 m2) or a house (from 90 m2), not per m2; Belgian commute times are our own car computation; German rents not comparable`]:
+    "Pas de loyers publiés pour la Belgique : notre estimation = médiane au m² de 4 à 8 annonces de location Immoweb "
+    + "par commune (relevées le 23/11/2026, loyer hors charges) ; achat en Belgique = prix médian d'un appartement "
     + "(50-70 m²) ou d'une maison (dès 90 m²), pas au m² ; temps de trajet belges calculés par nous, en voiture ; "
     + "loyers allemands non comparables",
   [`Mamer, Esch-sur-Alzette, Mersch, Wiltz and Remich hubs: own computation from the main station (car: OSRM free flow x peak factor calibrated on ChatHome; transit: official Luxembourg GTFS, which lacks French and German urban buses, and whose 'bad day' is timetable spread only)`]:
