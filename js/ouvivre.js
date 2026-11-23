@@ -6,9 +6,13 @@
 // left to live = net LU − rent (or mortgage payment) − fuel cost; null when the place has no car route (no number invented).
 // Cross-border transit fares are not collected: noted, never counted. No rent-by-size source exists: no size factor.
 
-export const HUBS = ["kirchberg", "lux-gare", "cloche-dor", "belval", "findel"];
+export const HUBS = ["kirchberg", "lux-gare", "cloche-dor", "belval", "findel", "mamer", "esch", "mersch", "wiltz", "remich"];
 export const SIZES = [50, 70, 90];
 export const COUNTRIES = ["LU", "FR", "DE", "BE"];
+// Hubs whose commute times are our own computation (scripts/extra_hubs.py), not the third-party ChatHome model.
+export const EXTRA_HUBS = ["mamer", "esch", "mersch", "wiltz", "remich"];
+// Source key of a place's commute figures for one hub.
+export const commuteSrcKey = (src, hub) => (EXTRA_HUBS.includes(hub) && src?.commute_extra_hubs ? "commute_extra_hubs" : "commute");
 
 const num = (v) => (typeof v === "number" && Number.isFinite(v) ? v : null);
 

@@ -60,7 +60,7 @@ export function renderPlace(el, p, { go }) {
   tiles.append(figTile(p.dist_lux_km == null ? null : `${num(p.dist_lux_km, 1)} km`, t("p.dist"), null, [ovSrc(p.src?.coords || "coords_manual")]));
 
   // commute table
-  const { sec, body } = block(t("p.commutes"), [ovSrc(p.src?.commute || "chathome")]);
+  const { sec, body } = block(t("p.commutes"), [...new Set([p.src?.commute || "chathome", p.src?.commute_extra_hubs].filter(Boolean))].map(ovSrc));
   const hubs = [...HUBS, "lux-city"];
   if (!p.commute) body.append(h("p", "muted", t("note.commute_not_published")));
   else {

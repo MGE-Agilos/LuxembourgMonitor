@@ -6,7 +6,7 @@ import { h } from "./dom.js";
 import { estMark, estText } from "./estimate.js";
 import { placeName } from "./grmap.js";
 import { getLang, t } from "./i18n.js";
-import { HUBS, computePlaces } from "./ouvivre.js";
+import { commuteSrcKey, HUBS, computePlaces } from "./ouvivre.js";
 import { ouvivreState } from "./ouvivre-ui.js";
 import { btn, eur, num, srcToggle } from "./ui.js";
 
@@ -107,7 +107,7 @@ function dailyRows(places, lang, hub = currentHub()) {
   };
   const rent = calc("rent"), buy = calc("buy");
   const src = (key) => {
-    const ids = new Set(places.map((r) => r.p?.src?.[key]).filter(Boolean));
+    const ids = new Set(places.map((r) => r.p?.src?.[key === "commute" ? commuteSrcKey(r.p?.src, hub) : key]).filter(Boolean));
     if (key === "rent_m2") rent.forEach((q) => q?.rent_estimated && q.rent_est?.source_ids?.forEach((i) => ids.add(i)));
     if (key === "sale_price_m2") buy.forEach((q) => q?.price_estimated && q.sale_est?.source_ids?.forEach((i) => ids.add(i)));
     return [...ids].map((id) => ov.sources[id]).filter(Boolean).map((s) => ({ name: s.name, url: s.url }));

@@ -8,7 +8,7 @@ import { fmt, label } from "./data.js";
 import { estMark, estText, officialOnly, setOfficialOnly } from "./estimate.js";
 import { placeName } from "./grmap.js";
 import { getLang, t } from "./i18n.js";
-import { COUNTRIES, HUBS, SIZES, computePlaces, rank, referenceHourlyWage, sortValue } from "./ouvivre.js";
+import { commuteSrcKey, COUNTRIES, HUBS, SIZES, computePlaces, rank, referenceHourlyWage, sortValue } from "./ouvivre.js";
 import { countryCompact } from "./pages.js";
 
 const PAGE = 10;
@@ -275,7 +275,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const estE = S.tenure === "rent" ? (p.rent_estimated ? p.rent_est : null) : (p.price_estimated ? p.sale_est : null);
     const estNote = estE ? estText(p, S.tenure === "rent" ? "rent" : "price") : null;
     const housingSrc = srcOf(S.tenure === "rent" ? p.src.rent_m2 : p.src.sale_price_m2) || (estE ? srcOf(estE.source_ids?.[0]) : null);
-    const commuteSrc = srcOf(p.src.commute);
+    const commuteSrc = srcOf(p.src[commuteSrcKey(p.src, S.hub)]);
     const fuelSrc = p.fuel_cost_month === null ? null : {
       name: `${t("d.fuel")} : ${eur(p.fuel_cost_month, lang)} (${t("d.fuel_basis", {
         l: num(A.consumption_l_per_100km, lang, 1), d: A.working_days_per_year, p: num(A.fuel_price_eur_per_l, lang, 3), m: A.fuel_price_period })}) — ${srcName(A.fuel_price_source)}`,
@@ -406,7 +406,7 @@ export function renderOuvivre({ lead, panel, legend, data, grmap, onCommune, onC
     const pick = (key) => uniqSrc(ranked.map((p) => srcOf(p.src?.[key])));
     const estIds = ranked.filter((p) => (rent ? p.rent_estimated : p.price_estimated)).flatMap((p) => (rent ? p.rent_est : p.sale_est)?.source_ids || []);
     const housingS = uniqSrc([...pick(rent ? "rent_m2" : "sale_price_m2"), ...[...new Set(estIds)].map(srcOf)]);
-    const commuteS = pick("commute");
+    const commuteS = uniqSrc(ranked.map((p) => srcOf(p.src?.[commuteSrcKey(p.src, S.hub)])));
     const salS = sal ? [sal] : [];
     const fuelS = A.fuel_price_source ? [srcOf(A.fuel_price_source)] : [];
     const cols = [

@@ -4,15 +4,19 @@
 
 const AT = {
   en: { kirchberg: "at Kirchberg", "lux-gare": "at the station (Gare)", "cloche-dor": "at Cloche d'Or", belval: "at Belval",
-    findel: "at Findel", "lux-city": "in Luxembourg City centre" },
+    findel: "at Findel", "lux-city": "in Luxembourg City centre", mamer: "in Capellen / Mamer", esch: "in Esch-sur-Alzette",
+    mersch: "in Mersch", wiltz: "in Wiltz", remich: "in Remich" },
   fr: { kirchberg: "au Kirchberg", "lux-gare": "à la Gare", "cloche-dor": "à la Cloche d'Or", belval: "à Belval",
-    findel: "au Findel", "lux-city": "au centre de Luxembourg-Ville" },
+    findel: "au Findel", "lux-city": "au centre de Luxembourg-Ville", mamer: "à Capellen / Mamer", esch: "à Esch-sur-Alzette",
+    mersch: "à Mersch", wiltz: "à Wiltz", remich: "à Remich" },
 };
 const NEAR = {
   en: { kirchberg: "near Kirchberg", "lux-gare": "near the station (Gare)", "cloche-dor": "near Cloche d'Or", belval: "near Belval",
-    findel: "near Findel", "lux-city": "near Luxembourg City centre" },
+    findel: "near Findel", "lux-city": "near Luxembourg City centre", mamer: "near Capellen / Mamer", esch: "near Esch-sur-Alzette",
+    mersch: "near Mersch", wiltz: "near Wiltz", remich: "near Remich" },
   fr: { kirchberg: "près du Kirchberg", "lux-gare": "près de la Gare", "cloche-dor": "près de la Cloche d'Or", belval: "près de Belval",
-    findel: "près du Findel", "lux-city": "près du centre de Luxembourg-Ville" },
+    findel: "près du Findel", "lux-city": "près du centre de Luxembourg-Ville", mamer: "près de Capellen / Mamer",
+    esch: "près d'Esch-sur-Alzette", mersch: "près de Mersch", wiltz: "près de Wiltz", remich: "près de Remich" },
 };
 
 const T = {
