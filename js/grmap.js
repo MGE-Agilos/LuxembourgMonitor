@@ -22,12 +22,12 @@ const HUB_COORDS = {
   belval: [5.946, 49.501],
   findel: [6.204, 49.633],
   "lux-city": [6.1319, 49.6116],
-  // added hubs: commune centroids (ChatHome localities), the points our own commute computation uses
-  mamer: [6.01196, 49.63516],
-  esch: [5.97964, 49.49582],
-  mersch: [6.08171, 49.74412],
-  wiltz: [5.93788, 49.98112],
-  remich: [6.35979, 49.54991],
+  // added hubs: main station of each town (official GTFS stops), the points our own commute computation uses
+  mamer: [6.020215, 49.625768],
+  esch: [5.985087, 49.493911],
+  mersch: [6.110298, 49.751844],
+  wiltz: [5.927075, 49.966369],
+  remich: [6.368293, 49.542737],
 };
 const DEFAULT_HUB = "lux-city";
 const MODES = ["km", "driving", "transit"];
